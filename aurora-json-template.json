@@ -1,0 +1,181 @@
+{
+  "_aurora_metadata": {
+    "report_id": "uuid-placeholder",
+    "schema_version": "2.0.0",
+    "created_at": "2025-10-05T10:30:00Z",
+    "created_by": "guide-name-placeholder",
+    "agent_version": "agent-2-v1.0.0",
+    "raw_conversation_id": "uuid-placeholder",
+    "processing_notes": [],
+    "description": "Aurora/InfoEx hybrid schema for daily operational reports",
+    "standards_compliance": ["OGRS", "InfoEx", "CAA"]
+  },
+  
+  "fieldSummary": {
+    "obDate": "yyyy/mm/dd",
+    "obStartTime": "HH:MM",
+    "obEndTime": "HH:MM",
+    "tempHigh": null,
+    "tempLow": null,
+    "elevationMin": null,
+    "elevationMax": null,
+    "windSpeed": "",
+    "windDirection": "",
+    "hs": null,
+    "hn24": null,
+    "hst": null,
+    "hstw": null,
+    "we": null,
+    "sky": "",
+    "precip": "",
+    "comments": "",
+    "locationUUIDs": [],
+    "operationUUID": "",
+    "state": "IN_REVIEW"
+  },
+  
+  "weather": {
+    "obDate": "yyyy/mm/dd",
+    "obTime": "HH:MM",
+    "tempMax": null,
+    "tempMin": null,
+    "windSpeed": "",
+    "windDirection": "",
+    "precip": "",
+    "hs": null,
+    "hn24": null,
+    "sky": "",
+    "footPen": null,
+    "baro": null,
+    "rh": null,
+    "comments": "",
+    "locationUUIDs": [],
+    "operationUUID": "",
+    "state": "IN_REVIEW"
+  },
+  
+  "avalancheProblems": [
+    {
+      "obDate": "yyyy/mm/dd",
+      "character": "",
+      "location": "",
+      "distribution": "",
+      "sensitivity": "",
+      "typicalSize": "",
+      "comment": "",
+      "locationUUIDs": [],
+      "operationUUID": "",
+      "state": "IN_REVIEW"
+    }
+  ],
+  
+  "hazardAssessment": {
+    "obDate": "yyyy/mm/dd",
+    "obTime": "HH:MM",
+    "assessmentType": "DAILY_ASSESSMENT",
+    "usersPresent": [],
+    "hazardRatings": [
+      {"elevationBand": "ALP", "hazardRating": ""},
+      {"elevationBand": "TL", "hazardRating": ""},
+      {"elevationBand": "BTL", "hazardRating": ""}
+    ],
+    "avalancheProblems": [],
+    "locationUUIDs": [],
+    "operationUUID": "",
+    "state": "IN_REVIEW"
+  },
+  
+  "avalancheObservations": [
+    {
+      "obDate": "yyyy/mm/dd",
+      "obTime": "HH:MM",
+      "num": "",
+      "trigger": "",
+      "character": "",
+      "sizeMin": null,
+      "aspectFrom": "",
+      "aspectTo": "",
+      "elevationMin": null,
+      "elevationMax": null,
+      "inclineMin": null,
+      "inclineMax": null,
+      "width": null,
+      "length": null,
+      "depthMin": null,
+      "depthMax": null,
+      "grainForm": "",
+      "bedSurfaceLevel": "",
+      "bedSurfaceType": "",
+      "comments": "",
+      "occurrenceTime": "",
+      "occurrenceTimezone": "America/Vancouver",
+      "locationUUIDs": [],
+      "operationUUID": "",
+      "state": "IN_REVIEW"
+    }
+  ],
+  
+  "snowpackObservations": [
+    {
+      "obDate": "yyyy/mm/dd",
+      "obTime": "HH:MM",
+      "elevation": null,
+      "aspect": "",
+      "slopeIncline": null,
+      "footPen": null,
+      "windSpeed": "",
+      "windDirection": "",
+      "sky": "",
+      "precip": "",
+      "airTemp": null,
+      "summary": "",
+      "observers": [],
+      "locationUUIDs": [],
+      "operationUUID": "",
+      "state": "IN_REVIEW"
+    }
+  ],
+  
+  "generalMessages": [
+    {
+      "obDate": "yyyy/mm/dd",
+      "title": "",
+      "message": "",
+      "locationUUIDs": [],
+      "operationUUID": "",
+      "state": "IN_REVIEW"
+    }
+  ],
+  
+  "_aurora_extensions": {
+    "submission_status": "pending",
+    "infoex_submission": null,
+    "validation_results": {},
+    "markdown_generated": false,
+    "processing_errors": []
+  },
+  
+  "_validation_schema": {
+    "required_observations": ["fieldSummary", "weather", "hazardAssessment"],
+    "conditional_observations": {
+      "avalancheObservations": "only if avalanches observed",
+      "snowpackObservations": "only if snowpack profiles taken"
+    },
+    "enum_validations": {
+      "windSpeed": ["C", "L", "M", "S", "X", "V"],
+      "windDirection": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "VAR", "ALL"],
+      "character": ["STORM_SLAB", "WIND_SLAB", "PERSISTENT_SLAB", "DEEP_PERSISTENT_SLAB", "WET_SLAB", "LOOSE_WET_AVALANCHE", "LOOSE_DRY_AVALANCHE", "GLIDE", "CORNICE", "UNKNOWN"],
+      "distribution": ["Isolated", "Specific", "Widespread"],
+      "sensitivity": ["Unreactive", "Stubborn", "Reactive", "Touchy"],
+      "elevationBand": ["ALP", "TL", "BTL", "ALL"],
+      "hazardRating": ["1", "2", "3", "4", "5"],
+      "state": ["IN_REVIEW", "SUBMITTED"],
+      "assessmentType": ["DAILY_ASSESSMENT", "FORECAST_ASSESSMENT", "INCIDENT_ASSESSMENT"]
+    },
+    "agent_workflow": {
+      "agent_1_role": "Conversational data collection through 15-step process",
+      "agent_2_role": "Format raw data to Aurora/InfoEx hybrid schema with OGRS translation",
+      "system_2_role": "Strip metadata and submit to InfoEx via /workflow/executionAggregate"
+    }
+  }
+}

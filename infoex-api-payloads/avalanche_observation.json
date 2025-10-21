@@ -1,0 +1,228 @@
+{
+  "_comment": "InfoEx Avalanche Observation Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/avalanche",
+  "_description": "Submit avalanche observation to InfoEx API. All fields include constraints and valid values.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "obTime": "13:00",
+  "_obTime_constraint": "REQUIRED. 24-hour format HH:MM. Range: 00:00 to 23:59. Time when avalanche was observed.",
+  
+  "num": "1",
+  "_num_constraint": "REQUIRED. String enum: '1','2','3','4','5','6','7','8','9','10','11','12','20','50','100','Iso','Sev','Num','NR','Unknown'. Number of avalanches observed.",
+  
+  "trigger": "Sa",
+  "_trigger_constraint": "REQUIRED. String enum: Natural: 'Na','Nc','Ne','Ni','Nr' | Explosives: 'Xa','Xc','Xb','Xe','Xg','Xh','Xhg','Xl','Xp','Xt','Xr','Xy' | Heli: 'Ha','Hc','Hr','Hy' | Vehicle: 'Va','Vc','Vr','Vy' | Skier: 'Sa','Sc','Sr','Sy' | Snowmobile: 'Ma','Mc','Mr','My' | Other: 'O','U'. Sa = Skier Accidental.",
+  
+  "character": "STORM_SLAB",
+  "_character_constraint": "REQUIRED. String enum: 'LOOSE_DRY_AVALANCHE','LOOSE_WET_AVALANCHE','STORM_SLAB','WIND_SLAB','PERSISTENT_SLAB','DEEP_PERSISTENT_SLAB','WET_SLAB','GLIDE','CORNICE','UNKNOWN'. Avalanche type classification.",
+  
+  "sizeMin": 1.5,
+  "_sizeMin_constraint": "Optional. Number (double). Minimum avalanche size on destructive scale. Range: 1.0 to 5.0, half-sizes allowed (1.5, 2.5, etc.). Must be <= sizeMax if both provided.",
+  
+  "sizeMax": 1.5,
+  "_sizeMax_constraint": "Optional. Number (double). Maximum avalanche size on destructive scale. Range: 1.0 to 5.0, half-sizes allowed. Must be >= sizeMin if both provided.",
+  
+  "size": "1.5",
+  "_size_constraint": "Optional. String enum: '1','1.5','2','2.5','3','3.5','4','4.5','5'. Overall avalanche size classification. Should match sizeMin/sizeMax values.",
+  
+  "aspectFrom": "N",
+  "_aspectFrom_constraint": "Optional. String enum: 'N','NE','E','SE','S','SW','W','NW','VAR','ALL'. Starting aspect of avalanche. Read clockwise from aspectFrom to aspectTo.",
+  
+  "aspectTo": "NE",
+  "_aspectTo_constraint": "Optional. String enum: 'N','NE','E','SE','S','SW','W','NW','VAR','ALL'. Ending aspect of avalanche. Read clockwise from aspectFrom to aspectTo.",
+  
+  "elevationMin": 1500,
+  "_elevationMin_constraint": "Optional. Number (double). Minimum elevation of start zone in meters. Typical range: 0-5000m. Must be <= elevationMax if both provided.",
+  
+  "elevationMax": 1800,
+  "_elevationMax_constraint": "Optional. Number (double). Maximum elevation of start zone in meters. Typical range: 0-5000m. Must be >= elevationMin if both provided.",
+  
+  "inclineMin": 35,
+  "_inclineMin_constraint": "Optional. Number (double). Minimum slope angle in degrees. Range: 0-90. Must be <= inclineMax if both provided. Typical avalanche terrain: 30-50 degrees.",
+  
+  "inclineMax": 45,
+  "_inclineMax_constraint": "Optional. Number (double). Maximum slope angle in degrees. Range: 0-90. Must be >= inclineMin if both provided. Typical avalanche terrain: 30-50 degrees.",
+  
+  "width": 50,
+  "_width_constraint": "Optional. Number (double). Avalanche width in meters. Range: 0-10000m. Measured perpendicular to flow direction.",
+  
+  "length": 100,
+  "_length_constraint": "Optional. Number (double). Avalanche length in meters. Range: 0-10000m. Measured parallel to flow direction from start zone to terminus.",
+  
+  "depthMin": 30,
+  "_depthMin_constraint": "Optional. Number (double). Minimum slab depth in centimeters. Range: 0-1000cm. Crown face depth measurement. Must be <= depthMax if both provided.",
+  
+  "depthMax": 50,
+  "_depthMax_constraint": "Optional. Number (double). Maximum slab depth in centimeters. Range: 0-1000cm. Crown face depth measurement. Must be >= depthMin if both provided.",
+  
+  "depthAvg": 40,
+  "_depthAvg_constraint": "Optional. Number (double). Average slab depth in centimeters. Range: 0-1000cm. Should be between depthMin and depthMax if all provided.",
+  
+  "grainForm": "SH",
+  "_grainForm_constraint": "Optional. String enum: Precipitation: 'PP','PPco','PPnd','PPpl','PPsd','PPir','PPgp','PPhl','PPip','PPrm' | Machine: 'MM','MMrp','MMci' | Decomposed: 'DF','DFdc','DFbk' | Rounded: 'RG','RGsr','RGlr','RGwp','RGxf' | Faceted: 'FC','FCso','FCsf','FCxr' | Depth Hoar: 'DH','DHcp','DHpr','DHch','DHla','DHxr' | Surface Hoar: 'SH','SHsu','SHcv','SHxr' | Melt: 'MF','MFsc','MFrc','MFtc','MFcl','MFpc','MFsl','MFcr' | Ice: 'IF','IFil','IFic','IFbi','IFrc','IFsc' | Other: 'CR','WG','IM'. Failure plane grain type.",
+  
+  "bedSurfaceLevel": "S",
+  "_bedSurfaceLevel_constraint": "Optional. String enum: 'S' = Storm snow (within recent storm), 'O' = Old snow (persistent weak layer), 'G' = Ground/glacial ice/firn, 'U' = Unknown. Where avalanche failed.",
+  
+  "bedSurfaceType": "SH",
+  "_bedSurfaceType_constraint": "Optional. String enum: Same as grainForm constraint. Grain type of the bed surface where failure occurred. Often matches grainForm.",
+  
+  "waterContentStartingZone": "D",
+  "_waterContentStartingZone_constraint": "Optional. String enum: 'D' = Dry (0%, T<0°C), 'M' = Moist (<3%, T=0°C, water not visible), 'W' = Wet (3-8%, T=0°C, water visible), 'U' = Unknown. Snow moisture in start zone.",
+  
+  "waterContentDeposit": "D",
+  "_waterContentDeposit_constraint": "Optional. String enum: 'D','M','W','U'. Same as waterContentStartingZone. Snow moisture in deposit area. May differ from start zone due to elevation/aspect changes.",
+  
+  "snowFailureType": "S",
+  "_snowFailureType_constraint": "Optional. String enum: 'S' = Slab, 'L' = Loose snow, 'LS' = Loose + Slab, 'C' = Cornice, 'CS' = Cornice + Slab, 'I' = Ice fall, 'IS' = Ice + Slab, 'GS' = Glide slab, 'U' = Unknown. Failure mechanism.",
+  
+  "terminus": "TR",
+  "_terminus_constraint": "Optional. String enum: 'SZ' = Stopped in start zone, 'TK' = Stopped in track, 'TR' = Top runout, 'MR' = Middle runout, 'BR' = Bottom runout, 'TP' = Top path (short), 'MP' = Middle path (short), 'BP' = Bottom path (short), 'U' = Unknown. Where avalanche stopped.",
+  
+  "occurrenceTime": "The avalanche was observed in motion on the observation date and time",
+  "_occurrenceTime_constraint": "Optional. String enum: 'Observed', 'The avalanche was observed in motion on the observation date and time', 'The avalanche occurred in the 12 hours before...', '...between 12 and 24 hours before...', '...between 24 and 48 hours before...', '...between 48 and 72 hours before...', '...more than 72 hours before...'. When avalanche occurred relative to observation.",
+  
+  "occurrenceTimezone": "America/Vancouver",
+  "_occurrenceTimezone_constraint": "Optional. String. Valid timezone identifier. Common: 'America/Vancouver' (Pacific), 'America/Edmonton' (Mountain), 'America/Winnipeg' (Central), 'America/Toronto' (Eastern).",
+  
+  "comments": "Storm slab triggered by skier on north aspect. Failure plane on surface hoar layer at 30-50cm depth. Avalanche stopped in upper runout zone.",
+  "_comments_constraint": "Optional. String. Free-form text description. Include relevant details about conditions, observations, and circumstances. No character limit specified.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "REQUIRED. Array of strings. Valid location UUIDs from your operation. Must exist in InfoEx location catalog. Use /location endpoint to discover available UUIDs.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "Optional but recommended. String. Your operation UUID. Should match the operation header value for consistency.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production.",
+  
+  "_optional_fields_not_included": {
+    "attachments": "Array of attachment objects for photos/files",
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "shareLevel": "String enum: 'EXCHANGE'|'PRIVATE' for data sharing",
+    "createUserUUID": "String UUID of creating user",
+    "reviewUserUUID": "String UUID of reviewing user", 
+    "submitUserUUID": "String UUID of submitting user",
+    "photoOverlays": "Array of photo overlay objects",
+    "blasterOfRecord": "String UUID for explosive control operations",
+    "shotLocation": "String enum: 'B'|'M'|'T'|'U' for shot placement",
+    "routeControl": "Boolean for avalanche control operations",
+    "controlRouteUUID": "String UUID for control route",
+    "occurrenceFromDateTime": "String MM/dd/yyyy HH:mm:ss format",
+    "occurrenceToDateTime": "String MM/dd/yyyy HH:mm:ss format",
+    "explosivesCharges": "Array of explosive charge objects",
+    "shotPlacement": "String UUID of shot placement location",
+    "exactLocations": "Point/Line/Polygon geometry objects",
+    "triggerDistance": "Number (double) trigger distance in meters",
+    "elevationAvg": "Number (double) average elevation in meters",
+    "inclineAvg": "Number (double) average incline in degrees",
+    "widthAvg": "Number (double) average width in meters",
+    "widthMax": "Number (double) maximum width in meters",
+    "lengthAvg": "Number (double) average length in meters", 
+    "lengthMax": "Number (double) maximum length in meters",
+    "depthEstimated": "Boolean if depth was estimated",
+    "lengthEstimated": "Boolean if length was estimated",
+    "grainFormRimed": "String if grain form was rimed",
+    "grainFormMin": "Number (double) min grain size in mm",
+    "grainFormMax": "Number (double) max grain size in mm",
+    "bedSurfaceRimed": "String if bed surface was rimed",
+    "bedSurfaceSizeMin": "Number (double) min bed surface size in mm",
+    "bedSurfaceSizeMax": "Number (double) max bed surface size in mm",
+    "depositOnRoadRail": "Number (double) deposit on road/rail in meters",
+    "distanceToToeDepositedMass": "Number (double) distance to toe in meters",
+    "aspectElevation": "JSON string with elevation band aspects",
+    "controlTeamUUIDs": "Array of control team UUIDs",
+    "uuid": "String UUID (auto-generated if not provided)",
+    "pwlUUID": "Array of Persistent Weak Layer UUIDs"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "obTime", "num", "trigger", "character", "locationUUIDs", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational reports",
+      "fields": ["sizeMin", "sizeMax", "size", "aspectFrom", "aspectTo", "elevationMin", "elevationMax", "inclineMin", "inclineMax", "width", "length", "depthMin", "depthMax", "depthAvg", "occurrenceTime", "occurrenceTimezone", "comments", "operationUUID"],
+      "notes": "These fields provide comprehensive avalanche documentation for operational decision-making and safety analysis"
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["grainForm", "bedSurfaceLevel", "bedSurfaceType", "waterContentStartingZone", "waterContentDeposit", "snowFailureType", "terminus", "attachments", "workflowExecutionUUID", "shareLevel", "createUserUUID", "reviewUserUUID", "submitUserUUID", "photoOverlays", "blasterOfRecord", "shotLocation", "routeControl", "controlRouteUUID", "occurrenceFromDateTime", "occurrenceToDateTime", "explosivesCharges", "shotPlacement", "exactLocations", "triggerDistance", "elevationAvg", "inclineAvg", "widthAvg", "widthMax", "lengthAvg", "lengthMax", "depthEstimated", "lengthEstimated", "grainFormRimed", "grainFormMin", "grainFormMax", "bedSurfaceRimed", "bedSurfaceSizeMin", "bedSurfaceSizeMax", "depositOnRoadRail", "distanceToToeDepositedMass", "aspectElevation", "controlTeamUUIDs", "uuid", "pwlUUID"],
+      "notes": "Include these fields only when specifically relevant or when users provide detailed information"
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "13:00",
+    "num": "1",
+    "trigger": "Sa",
+    "character": "STORM_SLAB",
+    "sizeMin": 1.5,
+    "sizeMax": 1.5,
+    "size": "1.5",
+    "aspectFrom": "N",
+    "aspectTo": "NE",
+    "elevationMin": 1500,
+    "elevationMax": 1800,
+    "inclineMin": 35,
+    "inclineMax": 45,
+    "width": 50,
+    "length": 100,
+    "depthMin": 30,
+    "depthMax": 50,
+    "depthAvg": 40,
+    "occurrenceTime": "The avalanche was observed in motion on the observation date and time",
+    "occurrenceTimezone": "America/Vancouver",
+    "comments": "Storm slab triggered by skier on north aspect. Avalanche dimensions: 50m wide, 100m long, 30-50cm deep crown face.",
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "13:00",
+    "num": "1",
+    "trigger": "Sa",
+    "character": "STORM_SLAB",
+    "sizeMin": 1.5,
+    "sizeMax": 1.5,
+    "size": "1.5",
+    "aspectFrom": "N",
+    "aspectTo": "NE",
+    "elevationMin": 1500,
+    "elevationMax": 1800,
+    "inclineMin": 35,
+    "inclineMax": 45,
+    "width": 50,
+    "length": 100,
+    "depthMin": 30,
+    "depthMax": 50,
+    "depthAvg": 40,
+    "grainForm": "SH",
+    "bedSurfaceLevel": "S",
+    "bedSurfaceType": "SH",
+    "waterContentStartingZone": "D",
+    "waterContentDeposit": "D",
+    "snowFailureType": "S",
+    "terminus": "TR",
+    "occurrenceTime": "The avalanche was observed in motion on the observation date and time",
+    "occurrenceTimezone": "America/Vancouver",
+    "comments": "Storm slab triggered by skier on north aspect. Failure plane on surface hoar layer at 30-50cm depth. Avalanche stopped in upper runout zone.",
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  }
+}

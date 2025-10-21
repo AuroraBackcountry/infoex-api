@@ -1,0 +1,147 @@
+{
+  "_IMPORTANT_README": "=== PERSISTENT WEAK LAYER (PWL) API REFERENCE ===",
+  
+  "_explanation_for_users_and_llms": {
+    "what_is_a_pwl": "A Persistent Weak Layer (PWL) is a long-lasting structural weakness in the snowpack that persists for weeks or months. Common types include surface hoar, faceted crystals, and depth hoar. PWLs are tracked throughout an entire season.",
+    
+    "api_scope": "This file documents the TWO working API operations for PWL management. After extensive testing, these are the ONLY PWL operations that work via API.",
+    
+    "operation_1_create": "POST /pwl - Create a new PWL with basic information (name, date, color, comment). This is used when a new persistent weak layer is first identified.",
+    
+    "operation_2_retrieve": "GET /pwl/operation?operationUUID={uuid} - Retrieve all PWLs for your operation, including any assessments that have been added through the InfoEx UI.",
+    
+    "critical_limitation": "PWL ASSESSMENTS CANNOT BE ADDED VIA API. After creating a PWL via API, all assessments (depth updates, stability observations, status changes) must be added through the InfoEx web interface. This limitation was confirmed through extensive testing including POST, PUT, and various endpoint attempts.",
+    
+    "workflow_summary": "1) Check if PWL exists (GET), 2) Create if new (POST - basic fields only), 3) Add/update assessments via InfoEx UI, 4) Retrieve complete PWL with assessments (GET)",
+    
+    "frequency": "Only create 2-3 PWLs per season when new persistent weak layers are identified. Do NOT create duplicate PWLs.",
+    
+    "llm_instruction": "When generating PWL submissions, ONLY use the fields in CREATE_PWL_PAYLOAD below. Do NOT attempt to include assessment arrays - they will be silently ignored by the API."
+  },
+
+  "_operation_1_create_pwl": "=== POST /pwl - CREATE NEW PWL ===",
+  
+  "_endpoint_create": "POST /pwl",
+  "_create_description": "Submit a new Persistent Weak Layer with basic tracking information",
+  
+  "_create_required_fields": {
+    "name": "REQUIRED. String. Descriptive name including crystal type and formation date.",
+    "creationDate": "REQUIRED. String. Date format: yyyy-mm-dd (ISO 8601 with dashes). Date when PWL was first identified.",
+    "operationUUID": "REQUIRED. String. Your operation UUID."
+  },
+  
+  "_create_aurora_ideal_fields": {
+    "name": "Descriptive name with crystal type and formation date",
+    "creationDate": "Formation/identification date in yyyy-mm-dd format", 
+    "color": "Hex color code for visualization (e.g., #FF6E53, #FFC911, #8ECF1B)",
+    "operationUUID": "Your operation UUID",
+    "comment": "Comprehensive description of PWL formation, burial, depth, distribution, and concerns"
+  },
+  
+  "_create_optional_fields": {
+    "communityPWLUUID": "Optional. String UUID. Links to community-wide PWL tracking effort. Typically null for operation-specific PWLs."
+  },
+
+  "CREATE_PWL_PAYLOAD": {
+    "name": "Surface Hoar 2025-02-15",
+    "creationDate": "2025-02-15",
+    "color": "#FF6E53",
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "comment": "Widespread surface hoar layer formed during clear, calm conditions Feb 10-15. Crystals 2-4mm observed on snow surface. Buried by 30cm storm snow Feb 16-18. Currently 20-30cm deep. Reactive in compression tests (CT12-15 Q2) across north aspects at treeline and alpine elevations. Primary concern for wind-loaded terrain and steep convexities. Requires ongoing monitoring throughout season."
+  },
+
+  "_create_response_example": {
+    "description": "Successful PWL creation returns the PWL with server-generated UUID",
+    "response": {
+      "name": "Surface Hoar 2025-02-15",
+      "creationDate": "2025-02-15",
+      "color": "#FF6E53",
+      "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+      "comment": "Widespread surface hoar layer formed during clear, calm conditions Feb 10-15...",
+      "uuid": "f8ae9daa-1d2b-442e-a280-1121706142ff"
+    }
+  },
+
+  "_operation_2_retrieve_pwls": "=== GET /pwl/operation - RETRIEVE ALL PWLs ===",
+  
+  "_endpoint_retrieve": "GET /pwl/operation?operationUUID={operationUUID}",
+  "_retrieve_description": "Get all PWLs for your operation, including any assessments added via InfoEx UI",
+  
+  "_retrieve_parameters": {
+    "operationUUID": "REQUIRED. Query parameter. Your operation UUID."
+  },
+
+  "_retrieve_headers": {
+    "api_key": "Your InfoEx API key",
+    "operation": "Your operation UUID",
+    "Content-Type": "application/json"
+  },
+
+  "GET_PWL_RESPONSE_EXAMPLE": [
+    {
+      "name": "Surface Hoar 2025-02-15",
+      "creationDate": "2025-02-15",
+      "color": "#FF6E53",
+      "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+      "comment": "Widespread surface hoar layer formed during clear, calm conditions Feb 10-15. Buried by storm snow Feb 16-18. Currently 20-30cm deep. Reactive in stability tests across north aspects at treeline and alpine elevations.",
+      "uuid": "f8ae9daa-1d2b-442e-a280-1121706142ff",
+      "assessment": [
+        {
+          "uuid": "assessment-uuid-1",
+          "obDate": "2025-02-20",
+          "status": "Active",
+          "crystalType": "SH",
+          "depthMin": 30,
+          "depthMax": 40,
+          "comment": "PWL assessment Feb 20: Layer now 30-40cm deep. CT15 Q2 at interface. Still reactive on north aspects.",
+          "aspectElevation": "N-NE 1700-2200m",
+          "locationUUIDs": ["15a7bb3f-18a1-4397-81b2-997626f32d20"],
+          "state": "SUBMITTED"
+        }
+      ]
+    }
+  ],
+
+  "_llm_guidance": {
+    "pwl_identification": "PWLs are long-lasting structural weaknesses. Common types: surface hoar (formed in clear/calm conditions), facets (formed near crusts or temperature gradients), depth hoar (basal facets from sustained temperature gradient). Must persist for weeks/months to qualify as PWL.",
+    
+    "naming_best_practices": [
+      "Include crystal type: 'Surface Hoar', 'Facets', 'Depth Hoar'",
+      "Include formation date: 'Surface Hoar 2025-02-15'",
+      "Keep concise but descriptive",
+      "Examples: 'Surface Hoar 2025-02-15', 'Facets Nov 2024', 'Depth Hoar Early Season 2024-25'"
+    ],
+    
+    "color_selection": {
+      "red_orange": "#FF6E53 - Active, concerning PWLs",
+      "yellow": "#FFC911 - Moderate concern PWLs",
+      "green": "#8ECF1B - Dormant or healing PWLs",
+      "blue": "#35A7FF - Alternative color for differentiation"
+    },
+    
+    "comment_construction": "Include: 1) Formation conditions and timing, 2) Burial event details, 3) Current depth range, 4) General reactivity/stability observations, 5) Spatial distribution (aspects/elevations), 6) Ongoing concerns and recommendations. This is the master comment that describes the PWL throughout its life.",
+    
+    "when_to_create": [
+      "New persistent weak layer identified",
+      "Layer expected to persist for weeks or months",
+      "Widespread distribution across operational area",
+      "Poses ongoing avalanche concern"
+    ],
+    
+    "when_not_to_create": [
+      "PWL already exists in system",
+      "Short-lived instability (use avalanche problems instead)",
+      "Isolated or very specific terrain feature",
+      "Layer already bonded or healed"
+    ],
+    
+    "critical_workflow": "Always check existing PWLs first with GET /pwl/operation before creating a new one. Only 2-3 PWLs should be created per season. Assessments track the evolution - add them via UI, not API."
+  },
+
+  "_enum_constraints": {
+    "assessment_status_examples": ["Active", "Dormant", "Healing", "No Longer a Concern"],
+    "crystalType_common": ["SH", "FC", "DH", "FCxr", "FCso", "DHcp", "DHpr"],
+    "state": ["IN_REVIEW", "SUBMITTED"],
+    "shareLevel": ["EXCHANGE", "PRIVATE"]
+  }
+}

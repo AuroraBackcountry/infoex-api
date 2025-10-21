@@ -1,0 +1,203 @@
+{
+  "_comment": "InfoEx Field Summary Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/fieldSummary",
+  "_description": "Submit field summary observation to InfoEx API. Comprehensive daily field report with weather, snow conditions, and operational details.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "obStartTime": "08:30",
+  "_obStartTime_constraint": "Optional. String. 24-hour format HH:MM. Start time of observation period. Range: 00:00 to 23:59.",
+  
+  "obEndTime": "15:45",
+  "_obEndTime_constraint": "Optional. String. 24-hour format HH:MM. End time of observation period. Must be after obStartTime if both provided.",
+  
+  "tempHigh": 0,
+  "_tempHigh_constraint": "Optional. Number (double). Maximum temperature in Celsius. Range: -50 to +50. Must be >= tempLow if both provided.",
+  
+  "tempLow": -2,
+  "_tempLow_constraint": "Optional. Number (double). Minimum temperature in Celsius. Range: -50 to +50. Must be <= tempHigh if both provided.",
+  
+  "elevationMin": 1200,
+  "_elevationMin_constraint": "Optional. Number (double). Minimum elevation observed in meters. Range: 0-5000m. Must be <= elevationMax if both provided.",
+  
+  "elevationMax": 2400,
+  "_elevationMax_constraint": "Optional. Number (double). Maximum elevation observed in meters. Range: 0-5000m. Must be >= elevationMin if both provided.",
+  
+  "windSpeed": "S",
+  "_windSpeed_constraint": "Optional. String enum: 'C' = Calm (0 km/h), 'L' = Light (1-25 km/h), 'M' = Moderate (26-40 km/h), 'S' = Strong (41-60 km/h), 'X' = Extreme (>60 km/h), 'V' = Variable. OGRS wind speed codes.",
+  
+  "windDirection": "S",
+  "_windDirection_constraint": "Optional. String enum: 'N','NE','E','SE','S','SW','W','NW','VAR','ALL'. Cardinal directions or variable/all directions.",
+  
+  "hs": 200,
+  "_hs_constraint": "Optional. Number (double). Height of snow (total snow depth) in centimeters. Range: 0-1000cm. Current total snow depth measurement.",
+  
+  "hn24": 30,
+  "_hn24_constraint": "Optional. Number (double). Height of new snow in 24 hours in centimeters. Range: 0-200cm. Must be <= hs if both provided.",
+  
+  "hst": 45,
+  "_hst_constraint": "Optional. Number (double). Height of storm snow in centimeters. Range: 0-500cm. Total snow from current storm cycle.",
+  
+  "hstw": 15,
+  "_hstw_constraint": "Optional. Number (double). Water equivalent of storm snow in millimeters. Range: 0-200mm. Water content of hst measurement.",
+  
+  "we": 25,
+  "_we_constraint": "Optional. Number (double). Water equivalent in millimeters. Range: 0-500mm. Total water equivalent of snowpack.",
+  
+  "sky": "OVC",
+  "_sky_constraint": "Optional. String enum: 'CLR' = Clear, 'FEW' = Few clouds, 'SCT' = Scattered, 'BKN' = Broken, 'OVC' = Overcast, 'X' = Obscured. OGRS sky condition codes.",
+  
+  "precip": "S2",
+  "_precip_constraint": "Optional. String. Precipitation type and intensity. Examples: 'NIL' = None, 'S1'-'S10' = Snow intensity, 'R' = Rain, 'RS' = Mixed. OGRS precipitation codes.",
+  
+  "amSky": "CLR",
+  "_amSky_constraint": "Optional. String enum: Same as sky constraint. Morning sky conditions using OGRS codes.",
+  
+  "pmSky": "OVC",
+  "_pmSky_constraint": "Optional. String enum: Same as sky constraint. Afternoon/evening sky conditions using OGRS codes.",
+  
+  "amWindSpeed": "L",
+  "_amWindSpeed_constraint": "Optional. String enum: Same as windSpeed constraint. Morning wind speed using OGRS codes.",
+  
+  "pmWindSpeed": "S",
+  "_pmWindSpeed_constraint": "Optional. String enum: Same as windSpeed constraint. Afternoon/evening wind speed using OGRS codes.",
+  
+  "amWindDirection": "W",
+  "_amWindDirection_constraint": "Optional. String enum: Same as windDirection constraint. Morning wind direction.",
+  
+  "pmWindDirection": "S",
+  "_pmWindDirection_constraint": "Optional. String enum: Same as windDirection constraint. Afternoon/evening wind direction.",
+  
+  "amPrecip": "NIL",
+  "_amPrecip_constraint": "Optional. String. Morning precipitation using OGRS codes. Same format as precip constraint.",
+  
+  "pmPrecip": "S2",
+  "_pmPrecip_constraint": "Optional. String. Afternoon/evening precipitation using OGRS codes. Same format as precip constraint.",
+  
+  "comments": "Excellent skiing conditions above 1500m. Storm snow bonding well with underlying layers. Wind transport active on exposed ridges creating wind slabs on lee aspects. Visibility good in morning, deteriorating in afternoon with snowfall.",
+  "_comments_constraint": "Optional. String. Free-form text description of field conditions, observations, and operational notes. Include relevant details about snow quality, hazards, and operational considerations.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "REQUIRED. Array of strings. Valid location UUIDs from your operation where field summary applies. Must exist in InfoEx location catalog. UI requires at least one location.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "REQUIRED. String. Your operation UUID. Must match the operation header value. UI requires this field for proper association.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production.",
+  
+  "_optional_fields_not_included": {
+    "attachments": "Array of attachment objects for photos/files",
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "shareLevel": "String enum: 'EXCHANGE'|'PRIVATE' for data sharing",
+    "createUserUUID": "String UUID of creating user",
+    "reviewUserUUID": "String UUID of reviewing user",
+    "submitUserUUID": "String UUID of submitting user",
+    "amVfTop": "Number (double) morning visibility at top in meters",
+    "amVfBottom": "Number (double) morning visibility at bottom in meters",
+    "pmVfTop": "Number (double) afternoon visibility at top in meters", 
+    "pmVfBottom": "Number (double) afternoon visibility at bottom in meters",
+    "amSurfaceForm": "String morning surface snow grain form using OGRS codes",
+    "amSurfaceRimed": "String if morning surface was rimed",
+    "amSurfaceAvgSize": "Number (double) morning surface grain average size in mm",
+    "amSurfaceMaxSize": "Number (double) morning surface grain max size in mm",
+    "pmSurfaceForm": "String afternoon surface snow grain form using OGRS codes",
+    "pmSurfaceRimed": "String if afternoon surface was rimed", 
+    "pmSurfaceAvgSize": "Number (double) afternoon surface grain average size in mm",
+    "pmSurfaceMaxSize": "Number (double) afternoon surface grain max size in mm",
+    "amSnowExtent": "String morning blowing snow extent",
+    "amSnowDirection": "String morning blowing snow direction",
+    "pmSnowExtent": "String afternoon blowing snow extent",
+    "pmSnowDirection": "String afternoon blowing snow direction",
+    "hstClearedDate": "String date when storm snow counter was cleared (MM/DD/YYYY)",
+    "hstClearedTime": "String time when storm snow counter was cleared (HH:MM)",
+    "hsComment": "String comments about snow depth measurements",
+    "elevation": "String elevation information",
+    "temp": "String temperature information",
+    "snowExtent": "String general blowing snow extent",
+    "snowDirection": "String general blowing snow direction",
+    "surfaceForms": "String surface snow forms",
+    "wind": "String wind information",
+    "uuid": "String UUID (auto-generated if not provided)"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational reports",
+      "fields": ["obStartTime", "obEndTime", "tempHigh", "tempLow", "elevationMin", "elevationMax", "amWindSpeed", "pmWindSpeed", "amWindDirection", "pmWindDirection", "hs", "hn24", "amSky", "pmSky", "amPrecip", "pmPrecip", "comments", "locationUUIDs", "operationUUID"],
+      "notes": "These fields provide comprehensive daily field conditions for operational decision-making. InfoEx UI requires AM/PM fields instead of singular sky/wind/precip fields."
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["hst", "hstw", "we", "amVfTop", "amVfBottom", "pmVfTop", "pmVfBottom", "amSurfaceForm", "amSurfaceRimed", "amSurfaceAvgSize", "amSurfaceMaxSize", "pmSurfaceForm", "pmSurfaceRimed", "pmSurfaceAvgSize", "pmSurfaceMaxSize", "amSnowExtent", "amSnowDirection", "pmSnowExtent", "pmSnowDirection", "hstClearedDate", "hstClearedTime", "hsComment", "elevation", "temp", "windSpeed", "windDirection", "sky", "precip", "snowExtent", "snowDirection", "surfaceForms", "wind", "attachments", "workflowExecutionUUID", "shareLevel", "createUserUUID", "reviewUserUUID", "submitUserUUID", "uuid"],
+      "notes": "Include these fields for detailed weather analysis, AM/PM comparisons, and technical measurements when specifically relevant"
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obStartTime": "08:30",
+    "obEndTime": "15:45",
+    "tempHigh": 0,
+    "tempLow": -2,
+    "elevationMin": 1200,
+    "elevationMax": 2400,
+    "amWindSpeed": "L",
+    "pmWindSpeed": "S",
+    "amWindDirection": "W",
+    "pmWindDirection": "S",
+    "hs": 200,
+    "hn24": 30,
+    "amSky": "CLR",
+    "pmSky": "OVC",
+    "amPrecip": "NIL",
+    "pmPrecip": "S2",
+    "comments": "Excellent skiing conditions above 1500m. Good snow quality and stability. Wind transport noted on exposed ridges. Conditions deteriorated from clear morning to overcast afternoon with snowfall.",
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obStartTime": "08:30",
+    "obEndTime": "15:45",
+    "tempHigh": 0,
+    "tempLow": -2,
+    "elevationMin": 1200,
+    "elevationMax": 2400,
+    "windSpeed": "S",
+    "windDirection": "S",
+    "hs": 200,
+    "hn24": 30,
+    "hst": 45,
+    "hstw": 15,
+    "we": 25,
+    "sky": "OVC",
+    "precip": "S2",
+    "amSky": "CLR",
+    "pmSky": "OVC",
+    "amWindSpeed": "L",
+    "pmWindSpeed": "S",
+    "amWindDirection": "W",
+    "pmWindDirection": "S",
+    "amPrecip": "NIL",
+    "pmPrecip": "S2",
+    "comments": "Excellent skiing conditions above 1500m. Storm snow bonding well with underlying layers. Wind transport active on exposed ridges creating wind slabs on lee aspects. Visibility good in morning, deteriorating in afternoon with snowfall.",
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  }
+}

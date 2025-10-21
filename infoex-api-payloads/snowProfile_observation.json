@@ -1,0 +1,250 @@
+{
+  "_comment": "InfoEx Snow Profile Observation Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/snowpack",
+  "_description": "Submit snow profile observation to InfoEx API. Detailed snowpack profile including stability tests, layer information, and location-specific observations.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "obTime": "14:00",
+  "_obTime_constraint": "Optional. String. 24-hour format HH:MM. Time when snowpack observation was made. Range: 00:00 to 23:59.",
+  
+  "aspectElevation": "N 1800m",
+  "_aspectElevation_constraint": "Optional. String. Aspect and elevation where observation was made. Format typically: 'N 1800m', 'NE 2100m', etc.",
+  
+  "elevation": 1800,
+  "_elevation_constraint": "Optional. Number. Elevation in meters where observation was made. Typical range: 1000-3000m for operational areas.",
+  
+  "aspect": "N",
+  "_aspect_constraint": "Optional. String. Cardinal or intercardinal direction: N, NE, E, SE, S, SW, W, NW. Aspect where observation was made.",
+  
+  "slopeIncline": 35,
+  "_slopeIncline_constraint": "Optional. Number. Slope angle in degrees. Typical range: 0-60 degrees. Avalanche terrain typically 30-45 degrees.",
+  
+  "summary": "Snowpack assessment at 1800m on north-facing slope. Recent storm slab over surface hoar weak layer. Compression test results: CT15 Q2 at 40cm depth.",
+  "_summary_constraint": "Optional. String. Free-form narrative summary of snowpack observations, stability tests, and findings. Max 4096 characters.",
+  
+  "footPen": 20,
+  "_footPen_constraint": "Optional. Number. Foot penetration depth in centimeters. Indicates snow surface hardness and recent loading.",
+  
+  "windSpeed": "M",
+  "_windSpeed_constraint": "Optional. String enum: 'C' = Calm, 'L' = Light, 'M' = Moderate, 'S' = Strong, 'X' = Extreme, 'V' = Variable. Wind speed at observation location.",
+  
+  "windDirection": "S",
+  "_windDirection_constraint": "Optional. String enum: N, NE, E, SE, S, SW, W, NW. Wind direction at observation location.",
+  
+  "sky": "BKN",
+  "_sky_constraint": "Optional. String. Sky conditions using OGRS codes: 'CLR' = Clear, 'FEW' = Few clouds, 'SCT' = Scattered, 'BKN' = Broken, 'OVC' = Overcast, 'OBS' = Obscured.",
+  
+  "precip": "S2",
+  "_precip_constraint": "Optional. String. Precipitation intensity using OGRS codes: 'NIL' = None, 'S-' = Light snow, 'S' = Snow, 'S+' = Heavy snow, 'S1' through 'S5' = Intensity scale, 'R' = Rain, 'R+' = Heavy rain.",
+  
+  "airTemp": -5,
+  "_airTemp_constraint": "Optional. Number. Air temperature in Celsius at observation location. Typical range: -40°C to +20°C.",
+  
+  "observers": ["4a9c17c0-e86b-4124-9a94-db8fbcd81d7c"],
+  "_observers_constraint": "Optional. Array of strings. User UUIDs of observers who conducted the snowpack observation. Must be valid user UUIDs in the system.",
+  
+  "observersString": "John Smith, Jane Doe",
+  "_observersString_constraint": "Optional. String. Comma-separated list of observer names. Alternative to observers array.",
+  
+  "pwlUUID": ["pwl-uuid-1"],
+  "_pwlUUID_constraint": "Optional. Array of strings. UUIDs of persistent weak layers identified in this observation. Links to PWL tracking system.",
+  
+  "pwlNames": "Surface Hoar 2025-02-15",
+  "_pwlNames_constraint": "Optional. String. Names or descriptions of persistent weak layers identified.",
+  
+  "snowProfile": null,
+  "_snowProfile_constraint": "Optional. Object or null. Detailed snow profile data structure. Can include layer-by-layer information, grain types, hardness, temperatures, etc. Complex structure - see InfoEx documentation for full schema.",
+  
+  "exactLocations": {
+    "type": "Point",
+    "coordinates": [-123.1207, 49.6819]
+  },
+  "_exactLocations_constraint": "Optional. GeoJSON object. Precise geographic location of observation. Type: 'Point', 'LineString', 'Polygon'. Coordinates in [longitude, latitude] format.",
+  
+  "photoOverlays": [],
+  "_photoOverlays_constraint": "Optional. Array of photo overlay objects. Links photos with terrain markup, avalanche paths, observation locations, etc. Complex structure with overlay annotations.",
+  
+  "attachments": [],
+  "_attachments_constraint": "Optional. Array of attachment objects. Photos, documents, or files associated with observation. Each attachment includes type, name, size, uuid.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "REQUIRED. Array of strings. Valid location UUIDs from your operation where observation was made. Must exist in InfoEx location catalog.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "REQUIRED. String. Your operation UUID. Must match the operation header value. Critical for API integration and data isolation.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production.",
+  
+  "shareLevel": "PRIVATE",
+  "_shareLevel_constraint": "Optional. String enum: 'EXCHANGE' = Share with InfoEx network, 'PRIVATE' = Keep within organization only. Defaults to organization settings if not specified.",
+  
+  "_enum_constraints": {
+    "aspect": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+    "windSpeed": ["C", "L", "M", "S", "X", "V"],
+    "windDirection": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+    "sky": ["CLR", "FEW", "SCT", "BKN", "OVC", "OBS"],
+    "state": ["IN_REVIEW", "SUBMITTED"],
+    "shareLevel": ["EXCHANGE", "PRIVATE"]
+  },
+  
+  "_optional_fields_not_included": {
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "createUserUUID": "String UUID of creating user",
+    "reviewUserUUID": "String UUID of reviewing user",
+    "submitUserUUID": "String UUID of submitting user",
+    "uuid": "String UUID (auto-generated if not provided)",
+    "deleted": "Boolean or string indicating if observation is deleted"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "locationUUIDs", "operationUUID", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational snowpack observations",
+      "fields": ["obDate", "obTime", "elevation", "aspect", "slopeIncline", "summary", "footPen", "airTemp", "exactLocations", "locationUUIDs", "operationUUID", "state"],
+      "notes": "Aurora ideal snowpack observations include: location details (elevation, aspect, slope), exact GPS coordinates (exactLocations), environmental conditions (air temp, foot penetration), and a comprehensive summary of findings including stability tests and layer information"
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["aspectElevation", "windSpeed", "windDirection", "sky", "precip", "observers", "observersString", "pwlUUID", "pwlNames", "snowProfile", "photoOverlays", "attachments", "workflowExecutionUUID", "createUserUUID", "reviewUserUUID", "submitUserUUID", "shareLevel", "uuid", "deleted"],
+      "notes": "Include these fields when: detailed weather data available, persistent weak layers identified, snow profile conducted, photos with terrain markup available, valid observer UUIDs are known"
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "13:30",
+    "elevation": 1800,
+    "aspect": "N",
+    "slopeIncline": 35,
+    "summary": "Snowpack assessment at 1800m on north-facing slope. Total snow depth 180cm. Recent 30cm storm slab (fist hardness) over 3cm surface hoar layer identified at 40cm depth. Compression test: CT15 Q2 at 40cm (sudden collapse, planar shear). Extended column test: ECTP20. Propagation saw test: PST End 35/100. Poor structure with reactive weak layer. Stability concerns on similar aspects and elevations.",
+    "footPen": 20,
+    "airTemp": -5,
+    "exactLocations": {
+      "type": "Point",
+      "coordinates": [-123.1207, 49.6819]
+    },
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "13:30",
+    "aspectElevation": "N 1800m",
+    "elevation": 1800,
+    "aspect": "N",
+    "slopeIncline": 35,
+    "summary": "Comprehensive snowpack assessment at 1800m on north-facing slope. Total snow depth 180cm. Recent 30cm storm slab (fist hardness) over 3cm surface hoar layer identified at 40cm depth. Full stability test suite completed: CT15 Q2 at 40cm (sudden collapse, planar shear), ECTP20, PST End 35/100. Poor structure with reactive weak layer. Stability concerns on similar aspects and elevations. See attached snow profile for detailed layer information.",
+    "footPen": 20,
+    "airTemp": -5,
+    "windSpeed": "L",
+    "windDirection": "S",
+    "sky": "BKN",
+    "precip": "NIL",
+    "observers": ["4a9c17c0-e86b-4124-9a94-db8fbcd81d7c"],
+    "observersString": "John Smith, Jane Doe",
+    "pwlUUID": ["pwl-uuid-surface-hoar-2025-02-15"],
+    "pwlNames": "Surface Hoar 2025-02-15",
+    "exactLocations": {
+      "type": "Point",
+      "coordinates": [-123.1207, 49.6819]
+    },
+    "snowProfile": null,
+    "photoOverlays": [],
+    "attachments": [],
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW",
+    "shareLevel": "PRIVATE"
+  },
+
+  "_stability_test_codes": {
+    "description": "Common stability test notation for summary field",
+    "compression_test": {
+      "format": "CT[taps] [quality] @ [depth]cm",
+      "quality_codes": {
+        "Q1": "Sudden planar failure (most concern)",
+        "Q2": "Sudden collapse",
+        "Q3": "Resistant planar failure"
+      },
+      "examples": ["CT12 Q1 @ 45cm", "CT15 Q2 @ 40cm", "CT20 Q3 @ 60cm"]
+    },
+    "extended_column_test": {
+      "format": "ECT[taps][result]",
+      "results": {
+        "N": "No result",
+        "P": "Propagation across entire column",
+        "X": "Sudden collapse without propagation"
+      },
+      "examples": ["ECTP15", "ECTN20", "ECTX18"]
+    },
+    "propagation_saw_test": {
+      "format": "PST [result] [distance]/100",
+      "results": {
+        "End": "Propagated to end of column",
+        "Arr": "Propagated across column and arrested"
+      },
+      "examples": ["PST End 35/100", "PST Arr 65/100"]
+    },
+    "rutschblock_test": {
+      "format": "RB[score]",
+      "scores": {
+        "1": "Whole block releases during cutting",
+        "2": "Whole block releases during loading",
+        "3": "Releases with one stomp",
+        "4": "Releases with stomping from knees",
+        "5": "Releases with stomping from waist",
+        "6": "Releases after jumping",
+        "7": "No release"
+      },
+      "examples": ["RB3", "RB5", "RB6"]
+    }
+  },
+
+  "_snow_layer_notation": {
+    "description": "Common grain form and hardness notation",
+    "grain_forms": {
+      "PP": "Precipitation particles",
+      "DF": "Decomposing fragments",
+      "RG": "Rounded grains",
+      "FC": "Faceted crystals",
+      "DH": "Depth hoar",
+      "SH": "Surface hoar",
+      "MF": "Melt forms",
+      "IF": "Ice formations"
+    },
+    "hardness_scale": {
+      "F-": "Fist minus (very soft)",
+      "F": "Fist",
+      "F+": "Fist plus",
+      "4F": "Four fingers",
+      "1F": "One finger",
+      "P": "Pencil",
+      "K": "Knife",
+      "I": "Ice"
+    }
+  },
+
+  "_llm_guidance": {
+    "summary_field_construction": "Include: total snow depth, recent loading, weak layer identification (depth, type, thickness), stability test results with notation, structural assessment, and spatial distribution of concern",
+    "stability_test_priority": "CT (Compression Test) is most common. ECT (Extended Column Test) shows propagation potential. PST (Propagation Saw Test) confirms propagation. Include test notation in summary.",
+    "weak_layer_identification": "Specify depth from surface, layer type (surface hoar, facets, depth hoar), thickness, and crystal characteristics if known",
+    "spatial_extrapolation": "Note which aspects, elevations, and terrain features likely have similar snowpack structure",
+    "environmental_context": "Air temperature, wind, sky, and precipitation provide context for snowpack evolution"
+  }
+}
+

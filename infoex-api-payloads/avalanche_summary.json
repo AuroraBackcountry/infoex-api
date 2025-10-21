@@ -1,0 +1,110 @@
+{
+  "_comment": "InfoEx Avalanche Summary Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/avalancheSummary",
+  "_description": "Submit avalanche summary observation to InfoEx API. Overview of avalanche activity for the day with area coverage and explosive control records.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "comments": "Summary of avalanche activity for the day. Storm slabs observed on north aspects above treeline. No natural avalanche activity noted. Explosive control work conducted on primary avalanche paths with good results.",
+  "_comments_constraint": "Optional. String. Free-form text description of overall avalanche conditions and activity summary. Include general observations about avalanche hazard, activity levels, and control work effectiveness. No character limit specified.",
+  
+  "percentAreaObserved": 75.0,
+  "_percentAreaObserved_constraint": "Optional. Number (double). Percentage of operational area that was observed for avalanche activity. Range: 0.0 to 100.0. Helps contextualize the completeness of avalanche observations and reliability of summary.",
+  
+  "avalanchesObserved": "New avalanches",
+  "_avalanchesObserved_constraint": "REQUIRED. String enum: 'New avalanches' = New avalanche activity observed, 'No new avalanches' = No new avalanche activity, 'Sluffing/Pinwheeling only' = Only minor loose snow activity. General assessment of avalanche activity level for the observation period.",
+  
+  
+  "explosivesRecords": [
+    {
+      "explosiveShots": 5,
+      "_explosiveShots_constraint": "Required if explosivesRecords included. Number. Total number of explosive shots fired during control operations. Range: 0-1000 typical.",
+      
+      "explosiveResults": 2,
+      "_explosiveResults_constraint": "Required if explosivesRecords included. Number. Number of shots that produced avalanche results. Must be <= explosiveShots. Range: 0 to explosiveShots value.",
+      
+      "chargeSize": 1.0,
+      "_chargeSize_constraint": "Required if explosivesRecords included. Number (double). Size of explosive charges used. Typical range: 0.1 to 10.0 depending on charge unit.",
+      
+      "chargeUnit": "kg",
+      "_chargeUnit_constraint": "Required if explosivesRecords included. String. Unit of measurement for charge size. Common values: 'kg' = kilograms, 'lb' = pounds, 'g' = grams. Must be valid unit accepted by API.",
+      
+      "explosiveSummary": "5 shots fired on main avalanche paths, 2 results with 1kg charges. Good control effectiveness on wind-loaded slopes.",
+      "_explosiveSummary_constraint": "Optional. String. Text summary of explosive control work performed. Include details about effectiveness, locations targeted, and results achieved."
+    }
+  ],
+  "_explosivesRecords_constraint": "Optional. Array of ExplosivesRecordDto objects. Documents explosive control work performed during the observation period. Each record documents a set of control operations. Leave empty array if no explosive control work performed.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "REQUIRED. Array of strings. Valid location UUIDs from your operation where avalanche summary applies. Must exist in InfoEx location catalog. Use /location endpoint to discover available UUIDs. Critical for API integration and data association.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "REQUIRED. String. Your operation UUID. Must match the operation header value. Critical for API integration, data isolation, and proper association with your operation.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production. Controls visibility and finalization status.",
+  
+  "_optional_fields_not_included": {
+    "attachments": "Array of attachment objects for photos/files related to avalanche summary",
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "shareLevel": "String enum: 'EXCHANGE'|'PRIVATE' for data sharing level",
+    "createUserUUID": "String UUID of user who created the observation",
+    "reviewUserUUID": "String UUID of user who reviewed the observation",
+    "submitUserUUID": "String UUID of user who submitted the observation",
+    "uuid": "String UUID of the observation (auto-generated if not provided)"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational reports",
+      "fields": ["avalanchesObserved", "percentAreaObserved", "comments", "locationUUIDs", "operationUUID"],
+      "notes": "These fields provide comprehensive avalanche activity summary for operational decision-making. Aurora does not use explosives, so explosivesRecords are not included in ideal tier."
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["explosivesRecords", "attachments", "workflowExecutionUUID", "shareLevel", "createUserUUID", "reviewUserUUID", "submitUserUUID", "uuid"],
+      "notes": "Include these fields only when specifically relevant (e.g., explosivesRecords for control operations)"
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "avalanchesObserved": "New avalanches",
+    "percentAreaObserved": 75.0,
+    "comments": "Summary of avalanche activity for the day. Storm slabs observed on north aspects above treeline. No natural avalanche activity noted during operational period.",
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "avalanchesObserved": "New avalanches",
+    "percentAreaObserved": 75.0,
+    "comments": "Summary of avalanche activity for the day. Storm slabs observed on north aspects above treeline. No natural avalanche activity noted. Explosive control work conducted on primary avalanche paths with good results.",
+    "explosivesRecords": [
+      {
+        "explosiveShots": 5,
+        "explosiveResults": 2,
+        "chargeSize": 1.0,
+        "chargeUnit": "kg",
+        "explosiveSummary": "5 shots fired on main avalanche paths, 2 results with 1kg charges. Good control effectiveness on wind-loaded slopes."
+      }
+    ],
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  }
+}
