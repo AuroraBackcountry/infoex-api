@@ -25,11 +25,11 @@ The reports are generated through a two-agent system:
 ### Date and Time Fields
 
 #### Date Format
-- **Required Format**: MM/DD/YYYY (discovered through API testing)
+- **Required Format**: MM/DD/YYYY (month/day/year)
 - **Input Variations**: 
+  - `2025-02-21` → `02/21/2025`
   - `2025/02/21` → `02/21/2025`
-  - `2025-07-08` → `07/08/2025`
-  - `2025/03/02` → `03/02/2025`
+  - `21-02-2025` → `02/21/2025`
 - **Validation**: Must be a valid calendar date
 - **Range**: Typically within 7 days of current date for operational reports
 - **API Error**: "must have format of mm/dd/yyyy" if incorrect format used

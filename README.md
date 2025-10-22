@@ -2,7 +2,11 @@
 
 ## Overview
 
-This project consists of **two separate systems** with a **two-agent architecture** that work together to transform conversational avalanche safety reports into structured data submitted to the InfoEx Canadian avalanche database.
+This project consists of **three integrated systems** that work together to transform conversational avalanche safety reports into structured data submitted to the InfoEx Canadian avalanche database:
+
+1. **Report Generation System** - Two-agent architecture for conversational data collection
+2. **InfoEx Submission System** - Direct API submission to InfoEx endpoints
+3. **Claude Agent Microservice** - Intelligent middleware for n8n integration (see [MICROSERVICE_ARCHITECTURE.md](MICROSERVICE_ARCHITECTURE.md))
 
 ---
 
@@ -438,6 +442,8 @@ CREATE TABLE enum_mappings (
 ### Supporting Documentation
 - `AGENT_INTEGRATION_SUMMARY.md` - Two-agent workflow details
 - `IMPLEMENTATION_GUIDE.md` - Implementation instructions
+- `MICROSERVICE_ARCHITECTURE.md` - Claude agent microservice detailed architecture
+- `DOCUMENTATION_UPDATES_SUMMARY.md` - Recent documentation standardization changes
 - `markdown-examples/` - Sample reports for reference
 
 ---

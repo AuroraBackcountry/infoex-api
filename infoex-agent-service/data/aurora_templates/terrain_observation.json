@@ -1,0 +1,169 @@
+{
+  "_comment": "InfoEx Terrain Observation Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/terrain",
+  "_description": "Submit terrain observation to InfoEx API. Documents terrain choices, ATES ratings, slope angles, wind exposure, and strategic mindset during operations.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "aspectElevation": "N 1800m",
+  "_aspectElevation_constraint": "Optional. String. Aspect and elevation of terrain observed. Format typically: 'N 1800m', 'NE 2100m', 'Multiple aspects 1500-2200m'.",
+  
+  "terrainNarrative": "Operated in simple terrain below treeline. Avoided wind-loaded slopes and steep convexities. Used terrain anchors and spacing for safe travel. No exposure to overhead hazard.",
+  "_terrainNarrative_constraint": "Optional but recommended. String. Free-form narrative describing terrain choices, decision-making process, and risk management strategies. Max 4096 characters. Include: terrain features used, hazards avoided, group management, and rationale for terrain selection.",
+  
+  "atesRating": "Simple",
+  "_atesRating_constraint": "Optional. String enum: 'Simple', 'Challenging', 'Complex'. Avalanche Terrain Exposure Scale rating for terrain traveled. Simple = Low angle or primarily forested with minimal exposure. Challenging = Some avalanche terrain with options to reduce exposure. Complex = Multiple avalanche paths or large expanses of steep terrain.",
+  
+  "terrainFeature": ["Trees/Forests", "Ridges", "Gullies"],
+  "_terrainFeature_constraint": "Optional. Array of strings. Terrain features encountered or utilized. Common values: 'Trees/Forests', 'Ridges', 'Gullies', 'Open Slopes', 'Alpine', 'Treeline', 'Below Treeline', 'Wind-loaded', 'Sheltered', 'Convex', 'Concave', 'Planar'.",
+  
+  "maxSlopeAngle": "35",
+  "_maxSlopeAngle_constraint": "Optional. String. Maximum slope angle encountered in degrees. Typical range: '0-30' (low angle), '30-35' (moderate), '35-40' (steep), '40-45' (very steep), '45+' (extreme). Important for terrain assessment and avalanche risk.",
+  
+  "windExposure": ["Sheltered", "Moderate"],
+  "_windExposure_constraint": "Optional. Array of strings. Wind exposure levels encountered. Common values: 'Sheltered', 'Moderate', 'Exposed', 'Highly Exposed'. Indicates terrain relationship to wind loading and transport.",
+  
+  "restrictions": ["Avoided steep convexities", "No overhead hazard exposure"],
+  "_restrictions_constraint": "Optional. Array of strings. Terrain restrictions or avoidances implemented. Examples: 'Avoided steep slopes', 'No overhead hazard', 'Stayed on ridges', 'Below angle of repose', 'Avoided wind-loaded slopes', 'Used spacing', 'One at a time exposure'.",
+  
+  "strategicMindset": "Status Quo",
+  "_strategicMindset_constraint": "Optional. String enum: 'Assessment', 'Stepping Out', 'Status Quo', 'Stepping Back', 'Maintenance', 'Entrenchment', 'Open Season', 'Spring Diurnal'. Overall strategic approach to terrain selection. Reflects decision-making framework and risk tolerance.",
+  
+  "percentAreaObserved": 75.0,
+  "_percentAreaObserved_constraint": "Optional. Number (double). Percentage of operational area observed (0-100). Indicates how much of the terrain was visually assessed versus traveled.",
+  
+  "attachments": [],
+  "_attachments_constraint": "Optional. Array of attachment objects. Photos of terrain features, slope angles, or terrain choices. Each attachment includes type, name, size, uuid.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "Optional but recommended. Array of strings. Valid location UUIDs from your operation where terrain observation applies. Must exist in InfoEx location catalog.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "Optional but recommended. String. Your operation UUID. Must match the operation header value. Critical for API integration and data isolation.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production.",
+  
+  "shareLevel": "PRIVATE",
+  "_shareLevel_constraint": "Optional. String enum: 'EXCHANGE' = Share with InfoEx network, 'PRIVATE' = Keep within organization only. Defaults to organization settings if not specified.",
+  
+  "_enum_constraints": {
+    "atesRating": ["Simple", "Challenging", "Complex"],
+    "state": ["IN_REVIEW", "SUBMITTED"],
+    "shareLevel": ["EXCHANGE", "PRIVATE"],
+    "strategicMindset": ["Assessment", "Stepping Out", "Status Quo", "Stepping Back", "Maintenance", "Entrenchment", "Open Season", "Spring Diurnal"],
+    "windExposure": ["Sheltered", "Lee", "Windward", "Scoured", "Crossloaded"],
+    "terrainFeature": ["Open Forest", "Closed Forest", "Cutblock", "Open Slopes", "Bowl", "Couloir", "Gully", "Concave", "Convex", "Planar", "Supported", "Unsupported", "Previously Skied", "Small Features", "Large Features", "Glaciated", "Start Zone", "Track", "Run Out"],
+    "restrictions": ["Visibility", "Snow Conditions", "Group Skill"],
+    "maxSlopeAngle": ["<30", "30", "35", "40", "45", ">45"]
+  },
+  
+  "_optional_fields_not_included": {
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "createUserUUID": "String UUID of creating user",
+    "reviewUserUUID": "String UUID of reviewing user",
+    "submitUserUUID": "String UUID of submitting user",
+    "uuid": "String UUID (auto-generated if not provided)"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational terrain observations",
+      "fields": ["obDate", "terrainNarrative", "atesRating", "maxSlopeAngle", "strategicMindset", "percentAreaObserved", "locationUUIDs", "operationUUID", "state"],
+      "notes": "Aurora ideal terrain observations include: comprehensive narrative of terrain choices and decision-making, ATES rating, maximum slope angle encountered, strategic mindset (use exact enum values), area coverage, and proper location/operation identification. This documents terrain management and risk mitigation strategies."
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["aspectElevation", "terrainFeature", "windExposure", "restrictions", "attachments", "workflowExecutionUUID", "createUserUUID", "reviewUserUUID", "submitUserUUID", "shareLevel", "uuid"],
+      "notes": "Include these fields when: specific terrain features need documentation, detailed restrictions were implemented, photos are available, or workflow/user tracking is required. Note: windExposure may have type validation issues - include in terrainNarrative instead if needed."
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "terrainNarrative": "Operated in simple to challenging terrain throughout the day. Started in low-angle treed terrain below 1500m, transitioned to ridgeline travel at treeline (1700-1800m). Maximum slope angles encountered were 35 degrees on wind-sheltered north aspects. Actively avoided steep convexities and wind-loaded features above treeline. Used terrain anchors (trees, ridges) for safe travel and implemented spacing protocols on steeper sections. No exposure to overhead hazard. Group management focused on conservative terrain choices given recent loading and observed instability signs. Maintained visual contact and communication throughout. Retreat options identified at all decision points.",
+    "atesRating": "Challenging",
+    "maxSlopeAngle": "35",
+    "strategicMindset": "Stepping Back",
+    "percentAreaObserved": 75.0,
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "aspectElevation": "N-NE 1500-1900m",
+    "terrainNarrative": "Comprehensive terrain assessment and management throughout operational day. Morning: Operated in simple terrain below 1500m in dense forest with minimal avalanche exposure. Mid-day: Transitioned to challenging terrain, utilizing ridgeline travel at treeline (1700-1800m) for access to observation points. Maximum slope angles encountered were 35 degrees on wind-sheltered north aspects during approach. Afternoon: Maintained conservative terrain choices on descent, avoiding steep wind-loaded features and convexities above treeline. Risk management: Implemented terrain anchors (trees, ridge features) for safe travel. Used spacing protocols on steeper sections (one-at-a-time exposure on 30+ degree slopes). Maintained visual contact and clear communication. Identified retreat options at all decision points. No exposure to overhead avalanche hazard. Group stayed below ridgeline on descent to avoid wind-loaded slopes. Strategic approach focused on conservative terrain selection given recent storm loading (30cm), observed surface hoar weak layer, and stability test results indicating poor structure.",
+    "atesRating": "Challenging",
+    "terrainFeature": ["Trees/Forests", "Ridges", "Treeline", "Below Treeline"],
+    "maxSlopeAngle": "35",
+    "windExposure": ["Sheltered", "Moderate"],
+    "restrictions": ["Avoided steep convexities", "No overhead hazard exposure", "One-at-a-time on steep slopes", "Avoided wind-loaded features"],
+    "strategicMindset": "Conservative",
+    "percentAreaObserved": 75.0,
+    "attachments": [],
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW",
+    "shareLevel": "PRIVATE"
+  },
+
+  "_ates_rating_guide": {
+    "description": "Avalanche Terrain Exposure Scale (ATES) - Canadian Standard",
+    "Simple": {
+      "definition": "Exposure to low angle or primarily forested terrain. Some forest openings may involve runout zones from infrequent avalanches. Many options to reduce or eliminate exposure. No glacier travel.",
+      "characteristics": ["Primarily below treeline", "Low angle slopes", "Dense forest", "Minimal avalanche paths", "Easy escape routes"],
+      "slope_angles": "Generally < 30 degrees"
+    },
+    "Challenging": {
+      "definition": "Exposure to well-defined avalanche paths, starting zones, or terrain traps. Options exist to reduce or eliminate exposure with careful route-finding.",
+      "characteristics": ["Mix of treed and open terrain", "Some avalanche paths", "Moderate slopes", "Terrain traps possible", "Route options available"],
+      "slope_angles": "Typically 30-35 degrees, some steeper"
+    },
+    "Complex": {
+      "definition": "Exposure to multiple overlapping avalanche paths or large expanses of steep, open terrain. Multiple avalanche starting zones and terrain traps below. Minimal options to reduce exposure.",
+      "characteristics": ["Extensive avalanche terrain", "Multiple paths", "Steep open slopes", "Significant terrain traps", "Limited safe zones"],
+      "slope_angles": "Frequently > 35 degrees"
+    }
+  },
+
+  "_strategic_mindset_guide": {
+    "description": "InfoEx Strategic Mindset enum values and meanings",
+    "Assessment": "Assessment mindset - gathering information, testing assumptions, building understanding",
+    "Stepping Out": "Stepping out mindset - cautiously expanding operations, careful testing of terrain",
+    "Status Quo": "Status quo mindset - normal operations with established protocols and standard precautions",
+    "Stepping Back": "Stepping back mindset - heightened caution, avoiding higher-risk terrain, larger safety margins",
+    "Maintenance": "Maintenance mindset - maintaining current conservative approach, no expansion",
+    "Entrenchment": "Entrenchment mindset - significant restrictions, minimal exposure, defensive posture",
+    "Open Season": "Open season mindset - favorable conditions allowing broader terrain access",
+    "Spring Diurnal": "Spring diurnal mindset - focus on timing and solar aspects, early starts and controlled descent times"
+  },
+
+  "_llm_guidance": {
+    "terrain_narrative_construction": "Include: terrain types traveled, maximum exposures, risk management strategies, group management techniques, decision points, and rationale for terrain choices. Connect terrain decisions to observed hazards and stability assessments.",
+    "key_documentation_priorities": [
+      "1. ATES rating and justification",
+      "2. Maximum slope angles and locations",
+      "3. Wind exposure levels",
+      "4. Specific hazards avoided",
+      "5. Group management strategies",
+      "6. Decision-making rationale"
+    ],
+    "terrain_risk_management": "Document what was avoided as much as what was traveled. Restrictions and avoidances demonstrate professional decision-making.",
+    "strategic_mindset_selection": "Should reflect overall approach and align with hazard conditions, stability assessment, and organizational risk tolerance."
+  }
+}
+

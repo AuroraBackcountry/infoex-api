@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  infoex-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Claude API
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Redis connection
+      - REDIS_URL=redis://redis:6379/0
+      # Environment selection
+      - ENVIRONMENT=${ENVIRONMENT:-staging}
+      # Staging credentials
+      - STAGING_API_KEY=${STAGING_API_KEY}
+      - STAGING_OPERATION_UUID=${STAGING_OPERATION_UUID}
+      - STAGING_URL=${STAGING_URL:-https://staging-can.infoex.ca/safe-server}
+      # Production credentials
+      - PRODUCTION_API_KEY=${PRODUCTION_API_KEY}
+      - PRODUCTION_OPERATION_UUID=${PRODUCTION_OPERATION_UUID}
+      - PRODUCTION_URL=${PRODUCTION_URL:-https://can.infoex.ca/safe-server}
+      # Service settings
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-["http://localhost:5678"]}
+    depends_on:
+      - redis
+    volumes:
+      - ./data:/app/data:ro
+      - ./app:/app/app:ro  # For development hot reload
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    networks:
+      - infoex-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - infoex-network
+
+networks:
+  infoex-network:
+    driver: bridge
+
+volumes:
+  redis_data:

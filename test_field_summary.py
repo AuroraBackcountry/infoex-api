@@ -51,16 +51,16 @@ def test_field_summary(env_vars):
     try:
         with open('infoex-api-payloads/field_summary.json', 'r') as f:
             data = json.load(f)
-            # Extract the clean payload
-            payload = data['CLEAN_PAYLOAD']
+            # Extract the Aurora ideal payload
+            payload = data['AURORA_IDEAL_PAYLOAD']
     except FileNotFoundError:
-        print("❌ Error: field_summary.json not found in markdown-examples/infoex-api-payloads/")
+        print("❌ Error: field_summary.json not found in infoex-api-payloads/")
         return False
     except json.JSONDecodeError as e:
         print(f"❌ Error: Invalid JSON: {e}")
         return False
     except KeyError:
-        print("❌ Error: CLEAN_PAYLOAD not found in JSON file")
+        print("❌ Error: AURORA_IDEAL_PAYLOAD not found in JSON file")
         return False
     
     print(f"\n🧪 Testing Field Summary Submission")

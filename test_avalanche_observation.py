@@ -51,13 +51,16 @@ def test_avalanche_observation(env_vars):
     try:
         with open('infoex-api-payloads/avalanche_observation.json', 'r') as f:
             data = json.load(f)
-            # Extract the clean payload
-            payload = data['CLEAN_PAYLOAD']
+            # Extract the Aurora ideal payload
+            payload = data['AURORA_IDEAL_PAYLOAD']
     except FileNotFoundError:
-        print("❌ Error: avalanche_observation.json not found in markdown-examples/infoex-api-payloads/")
+        print("❌ Error: avalanche_observation.json not found in infoex-api-payloads/")
         return False
     except json.JSONDecodeError as e:
         print(f"❌ Error: Invalid JSON: {e}")
+        return False
+    except KeyError:
+        print("❌ Error: AURORA_IDEAL_PAYLOAD not found in JSON file")
         return False
     
     print(f"\n🧪 Testing Avalanche Observation Submission")

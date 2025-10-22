@@ -1,0 +1,40 @@
+# Core framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0.post1
+
+# Anthropic API
+anthropic==0.7.7
+
+# Redis for session management
+redis==5.0.1
+
+# Request handling
+httpx==0.25.2
+requests==2.31.0
+
+# Data validation and serialization
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Environment management
+python-dotenv==1.0.0
+
+# Date/time handling
+python-dateutil==2.8.2
+
+# JSON handling
+orjson==3.9.10
+
+# Logging
+structlog==23.2.0
+
+# Development tools
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+black==23.12.0
+flake8==6.1.0
+mypy==1.7.1
+
+# CORS support
+python-multipart==0.0.6

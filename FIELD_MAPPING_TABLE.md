@@ -98,7 +98,7 @@ POST /observation/hazardAssessment
 ### Report Metadata
 | Aurora Field Path | InfoEx Field | InfoEx Schema | Conversion Notes |
 |------------------|-------------|---------------|------------------|
-| `report_header.date.value` | `obDate` | All schemas | Convert YYYY-MM-DD → yyyy/mm/dd |
+| `report_header.date.value` | `obDate` | All schemas | Convert to MM/DD/YYYY format |
 | `report_header.zone.value` | `locationUUIDs` | All schemas | Resolve zone name to UUID array |
 | `operational_summary.start_time.value` | `obTime` | All schemas | Use HH:MM format |
 | `operational_summary.summary.value` | `comments` | FieldSummaryLightDTO | Narrative text |
@@ -132,9 +132,17 @@ POST /observation/hazardAssessment
 
 ### 1. Date Format Conversion
 ```javascript
-function convertDateFormat(isoDate) {
-  // "2025-02-21" → "2025/02/21"
-  return isoDate.replace(/-/g, '/');
+function convertDateFormat(inputDate) {
+  // Convert various formats to MM/DD/YYYY
+  // "2025-02-21" → "02/21/2025"
+  // "2025/02/21" → "02/21/2025"
+  const parts = inputDate.split(/[-\/]/);
+  if (parts[0].length === 4) {
+    // Year first format
+    return `${parts[1].padStart(2, '0')}/${parts[2].padStart(2, '0')}/${parts[0]}`;
+  }
+  // Already in MM/DD/YYYY format
+  return inputDate;
 }
 ```
 

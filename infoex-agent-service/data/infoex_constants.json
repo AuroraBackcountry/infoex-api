@@ -1,0 +1,557 @@
+{
+  "sky": [
+    "CLR",
+    "FEW",
+    "-FEW",
+    "SCT",
+    "-SCT",
+    "BKN",
+    "-BKN",
+    "OVC",
+    "-OVC",
+    "X"
+  ],
+  "precipitation": [
+    "NIL",
+    "R",
+    "S",
+    "RS",
+    "G",
+    "ZR",
+    "S-1",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "S10",
+    "RV",
+    "RL",
+    "RM",
+    "RH"
+  ],
+  "swagPrecipitation": [
+    "NO",
+    "RA",
+    "SN",
+    "RS",
+    "GR",
+    "ZR",
+    "S-1",
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7",
+    "S8",
+    "S9",
+    "S10",
+    "RV",
+    "RL",
+    "RM",
+    "RH"
+  ],
+  "terminus": [
+    "SZ",
+    "TK",
+    "TR",
+    "MR",
+    "BR",
+    "TP",
+    "MP",
+    "BP",
+    "U"
+  ],
+  "windSpeed": [
+    "C",
+    "L",
+    "M",
+    "S",
+    "X",
+    "V"
+  ],
+  "cardinalDirection": [
+    "ALL",
+    "VAR",
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SW",
+    "W",
+    "NW"
+  ],
+  "aspectDirection": [
+    "N",
+    "NE",
+    "E",
+    "SE",
+    "S",
+    "SW",
+    "W",
+    "NW",
+    "VAR",
+    "ALL"
+  ],
+  "snowForm": [
+    "PP",
+    "PPco",
+    "PPnd",
+    "PPpl",
+    "PPsd",
+    "PPir",
+    "PPgp",
+    "PPhl",
+    "PPip",
+    "PPrm",
+    "MM",
+    "MMrp",
+    "MMci",
+    "DF",
+    "DFdc",
+    "DFbk",
+    "RG",
+    "RGsr",
+    "RGlr",
+    "RGwp",
+    "RGxf",
+    "FC",
+    "FCso",
+    "FCsf",
+    "FCxr",
+    "DH",
+    "DHcp",
+    "DHpr",
+    "DHch",
+    "DHla",
+    "DHxr",
+    "SH",
+    "SHsu",
+    "SHcv",
+    "SHxr",
+    "MF",
+    "MFsc",
+    "MFrc",
+    "MFtc",
+    "MFcl",
+    "MFpc",
+    "MFsl",
+    "MFcr",
+    "IF",
+    "IFil",
+    "IFic",
+    "IFbi",
+    "IFrc",
+    "IFsc",
+    "CR",
+    "WG",
+    "IM"
+  ],
+  "blowingSnowExtent": [
+    "Nil",
+    "Prev",
+    "L",
+    "M",
+    "I",
+    "U"
+  ],
+  "trigger": [
+    "Na",
+    "Nc",
+    "Ne",
+    "Ni",
+    "Nr",
+    "Xa",
+    "Xb",
+    "Xc",
+    "Xd",
+    "Xe",
+    "Xg",
+    "Xh",
+    "Xhg",
+    "Xl",
+    "Xp",
+    "Xt",
+    "Xr",
+    "Xy",
+    "Ha",
+    "Hc",
+    "Hr",
+    "Hy",
+    "Va",
+    "Vc",
+    "Vr",
+    "Vy",
+    "Sa",
+    "Sc",
+    "Sr",
+    "Sy",
+    "Ma",
+    "Mc",
+    "Mr",
+    "My",
+    "O",
+    "U"
+  ],
+  "swagTrigger": [
+    "N",
+    "NC",
+    "NE",
+    "NI",
+    "NL",
+    "NS",
+    "NR",
+    "NO",
+    "A",
+    "AA",
+    "AB",
+    "AC",
+    "AE",
+    "AF",
+    "AH",
+    "AI",
+    "AK",
+    "AL",
+    "AM",
+    "AO",
+    "AP",
+    "AR",
+    "AS",
+    "AU",
+    "AV",
+    "AX",
+    "U"
+  ],
+  "swagTriggerMod": [
+    "c",
+    "u",
+    "r",
+    "y"
+  ],
+  "character": [
+    {
+      "value": "LOOSE_DRY_AVALANCHE",
+      "label": "Dry Loose",
+      "colour": "#D999FF"
+    },
+    {
+      "value": "LOOSE_WET_AVALANCHE",
+      "label": "Wet Loose",
+      "colour": "#35CFCE"
+    },
+    {
+      "value": "STORM_SLAB",
+      "label": "Storm Slab",
+      "colour": "#FFC911"
+    },
+    {
+      "value": "WIND_SLAB",
+      "label": "Wind Slab",
+      "colour": "#8ECF1B"
+    },
+    {
+      "value": "PERSISTENT_SLAB",
+      "label": "Persistent Slab",
+      "colour": "#FF6E53"
+    },
+    {
+      "value": "DEEP_PERSISTENT_SLAB",
+      "label": "Deep Persistent Slab",
+      "colour": "#F30030"
+    },
+    {
+      "value": "WET_SLAB",
+      "label": "Wet Slab",
+      "colour": "#35A7FF"
+    },
+    {
+      "value": "GLIDE",
+      "label": "Glide Slab",
+      "colour": "#7E8BB4"
+    },
+    {
+      "value": "CORNICE",
+      "label": "Cornice",
+      "colour": "#05D265"
+    },
+    {
+      "value": "UNKNOWN",
+      "label": "Unknown",
+      "colour": "#CA8B60"
+    }
+  ],
+  "snowFailure": [
+    "S",
+    "L",
+    "LS",
+    "C",
+    "CS",
+    "I",
+    "IS",
+    "GS",
+    "U"
+  ],
+  "swagSnowFailure": [
+    "L",
+    "WL",
+    "SS",
+    "HS",
+    "WS",
+    "I",
+    "SF",
+    "C",
+    "R",
+    "U"
+  ],
+  "bedSurfaceLevel": [
+    "S",
+    "O",
+    "G",
+    "U"
+  ],
+  "swagBedSurfaceLevel": [
+    "S",
+    "O",
+    "G",
+    "U",
+    "I"
+  ],
+  "bedSurfaceType": [
+    "PP",
+    "PPco",
+    "PPnd",
+    "PPpl",
+    "PPsd",
+    "PPir",
+    "PPgp",
+    "PPhl",
+    "PPip",
+    "PPrm",
+    "MM",
+    "MMrp",
+    "MMci",
+    "DF",
+    "DFdc",
+    "DFbk",
+    "RG",
+    "RGsr",
+    "RGlr",
+    "RGwp",
+    "RGxf",
+    "FC",
+    "FCso",
+    "FCsf",
+    "FCxr",
+    "DH",
+    "DHcp",
+    "DHpr",
+    "DHch",
+    "DHla",
+    "DHxr",
+    "SH",
+    "SHsu",
+    "SHcv",
+    "SHxr",
+    "MF",
+    "MFsc",
+    "MFrc",
+    "MFtc",
+    "MFcl",
+    "MFpc",
+    "MFsl",
+    "MFcr",
+    "IF",
+    "IFil",
+    "IFic",
+    "IFbi",
+    "IFrc",
+    "IFsc",
+    "CR",
+    "WG",
+    "IM"
+  ],
+  "waterContent": [
+    "D",
+    "M",
+    "W",
+    "U"
+  ],
+  "maxSlopeAngle": [
+    "<30",
+    "30",
+    "35",
+    "40",
+    "45",
+    ">45"
+  ],
+  "atesRating": [
+    "Simple",
+    "Challenging",
+    "Complex"
+  ],
+  "terrainFeature": [
+    "Open Forest",
+    "Closed Forest",
+    "Cutblock",
+    "Open Slopes",
+    "Bowl",
+    "Couloir",
+    "Gully",
+    "Concave",
+    "Convex",
+    "Planar",
+    "Supported",
+    "Unsupported",
+    "Previously Skied",
+    "Small Features",
+    "Large Features",
+    "Glaciated",
+    "Start Zone",
+    "Track",
+    "Run Out"
+  ],
+  "windExposure": [
+    "Sheltered",
+    "Lee",
+    "Windward",
+    "Scoured",
+    "Crossloaded"
+  ],
+  "restrictions": [
+    "Visibility",
+    "Snow Conditions",
+    "Group Skill"
+  ],
+  "strategicMindset": [
+    "Assessment",
+    "Stepping Out",
+    "Status Quo",
+    "Stepping Back",
+    "Maintenance",
+    "Entrenchment",
+    "Open Season",
+    "Spring Diurnal"
+  ],
+  "trend": [
+    "RR",
+    "R",
+    "S",
+    "F",
+    "FR"
+  ],
+  "mapLayerType": [
+    "TILELAYER",
+    "STYLELAYER",
+    "WMS"
+  ],
+  "swagBlowingSnowExtent": [
+    "None",
+    "Prev",
+    "L",
+    "M",
+    "I",
+    "U"
+  ],
+  "typicalSize": [
+    "1",
+    "1.5",
+    "2",
+    "2.5",
+    "3",
+    "3.5",
+    "4",
+    "4.5",
+    "5"
+  ],
+  "distribution": [
+    "Isolated",
+    "Specific",
+    "Widespread"
+  ],
+  "sensitivity": [
+    "Unreactive",
+    "Stubborn",
+    "Reactive",
+    "Touchy"
+  ],
+  "elevationBand": {
+    "ALL": {
+      "value": "ALL",
+      "label": "All",
+      "genericLabel": "All"
+    },
+    "ALP": {
+      "value": "ALP",
+      "label": "Alpine",
+      "genericLabel": "High Elevation"
+    },
+    "TL": {
+      "value": "TL",
+      "label": "Treeline",
+      "genericLabel": "Mid Elevation"
+    },
+    "BTL": {
+      "value": "BTL",
+      "label": "Below Treeline",
+      "genericLabel": "Low Elevation"
+    }
+  },
+  "confidence": [
+    "Low",
+    "Moderate",
+    "High"
+  ],
+  "hazardRatingConstants": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "n/a"
+  ],
+  "pwlConstants": {
+    "Active": {
+      "value": "Active",
+      "label": "Active",
+      "colour": "#F25467"
+    },
+    "Developing": {
+      "value": "Developing",
+      "label": "Developing",
+      "colour": "#FF7B47"
+    },
+    "Inactive": {
+      "value": "Inactive",
+      "label": "Inactive",
+      "colour": null
+    },
+    "Dormant": {
+      "value": "Dormant",
+      "label": "Dormant",
+      "colour": "#8A89C9"
+    }
+  },
+  "failurePlane": [
+    "Non-persistent"
+  ],
+  "avalanchesObserved": [
+    "New avalanches",
+    "No new avalanches",
+    "Sluffing/Pinwheeling only"
+  ],
+  "assessmentType": [
+    "Forecast",
+    "Nowcast"
+  ],
+  "hazardElevationBands": [
+    "All",
+    "Single"
+  ]
+}

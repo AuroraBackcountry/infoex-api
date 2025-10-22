@@ -1,0 +1,120 @@
+{
+  "_comment": "InfoEx Snowpack Summary Payload - Copy/Paste Ready",
+  "_endpoint": "POST /observation/snowpackAssessment",
+  "_description": "Submit snowpack summary observation to InfoEx API. High-level overview of general snowpack conditions and stability without detailed profile data.",
+  
+  "obDate": "10/07/2025",
+  "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",
+  
+  "obTime": "14:00",
+  "_obTime_constraint": "Optional. String. 24-hour format HH:MM. Time when snowpack assessment was made. Range: 00:00 to 23:59.",
+  
+  "snowpackSummary": "Widespread surface hoar over storm snow interface creating reactive weak layer. Recent loading from 30cm storm snow. Stability tests indicate poor structure across north aspects at treeline and alpine elevations. CT scores range from CT12-CT18 with Q1-Q2 results. Extended column tests show propagation potential (ECTP). Concerns for human-triggered avalanches on wind-loaded terrain.",
+  "_snowpackSummary_constraint": "Optional but recommended. String. Free-form narrative summary of overall snowpack conditions, structure, and stability concerns across the forecast area. Max 4096 characters. Include: general snowpack structure, weak layers of concern, spatial distribution of problems, stability test summary, and overall assessment.",
+  
+  "attachments": [],
+  "_attachments_constraint": "Optional. Array of attachment objects. Photos, documents, or files associated with assessment. Each attachment includes type, name, size, uuid.",
+  
+  "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+  "_locationUUIDs_constraint": "Optional but recommended. Array of strings. Valid location UUIDs from your operation where assessment applies. Must exist in InfoEx location catalog.",
+  
+  "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+  "_operationUUID_constraint": "Optional but recommended. String. Your operation UUID. Must match the operation header value. Critical for API integration and data isolation.",
+  
+  "state": "IN_REVIEW",
+  "_state_constraint": "REQUIRED. String enum: 'IN_REVIEW' = Needs review before final submission, 'SUBMITTED' = Finalized observation. Use IN_REVIEW for testing, SUBMITTED for production.",
+  
+  "shareLevel": "PRIVATE",
+  "_shareLevel_constraint": "Optional. String enum: 'EXCHANGE' = Share with InfoEx network, 'PRIVATE' = Keep within organization only. Defaults to organization settings if not specified.",
+  
+  "_enum_constraints": {
+    "state": ["IN_REVIEW", "SUBMITTED"],
+    "shareLevel": ["EXCHANGE", "PRIVATE"]
+  },
+  
+  "_optional_fields_not_included": {
+    "workflowExecutionUUID": "String UUID for workflow association",
+    "createUserUUID": "String UUID of creating user",
+    "reviewUserUUID": "String UUID of reviewing user",
+    "submitUserUUID": "String UUID of submitting user",
+    "uuid": "String UUID (auto-generated if not provided)"
+  },
+
+  "_three_tier_approach": {
+    "description": "Aurora uses a three-tier approach for API payload construction",
+    
+    "tier_1_api_required": {
+      "description": "Minimum fields required for successful API submission",
+      "fields": ["obDate", "state"],
+      "notes": "These fields are absolutely required by the InfoEx API - submission will fail without them"
+    },
+    
+    "tier_2_aurora_ideal": {
+      "description": "Fields Aurora Backcountry considers essential for complete operational snowpack assessments",
+      "fields": ["obDate", "obTime", "snowpackSummary", "attachments", "locationUUIDs", "operationUUID", "state"],
+      "notes": "Aurora ideal snowpack assessments include: comprehensive summary of snowpack structure and stability concerns, timing information, photo attachments for visual documentation, and proper location/operation identification. This is a high-level assessment that summarizes conditions across the forecast area."
+    },
+    
+    "tier_3_optional_bonus": {
+      "description": "Additional fields that can enhance reports but are not essential",
+      "fields": ["workflowExecutionUUID", "createUserUUID", "reviewUserUUID", "submitUserUUID", "shareLevel", "uuid"],
+      "notes": "Include these fields when: workflow tracking is needed or specific user tracking is required"
+    }
+  },
+
+  "_payload_examples": "=== COPY/PASTE READY PAYLOADS ===",
+  
+  "AURORA_IDEAL_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "15:00",
+    "snowpackSummary": "Widespread surface hoar over storm snow interface creating reactive weak layer. Recent loading from 30cm storm snow over the past 48 hours. Stability tests indicate poor structure across north aspects at treeline and alpine elevations. Compression test scores range from CT12-CT18 with Q1-Q2 results indicating sudden planar failures. Extended column tests show propagation potential (ECTP15-20). Concerns for human-triggered avalanches on wind-loaded terrain, particularly steep north-facing slopes above treeline. Recommend conservative terrain choices and careful slope assessment.",
+    "attachments": [],
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW"
+  },
+  
+  "COMPREHENSIVE_PAYLOAD": {
+    "obDate": "10/07/2025",
+    "obTime": "15:00",
+    "snowpackSummary": "Comprehensive snowpack assessment for the forecast area. Widespread surface hoar layer (2-4mm crystals) buried 30-40cm below surface under recent storm snow. This interface is creating a reactive weak layer across multiple aspects and elevations. Storm snow loading: 30cm over 48 hours with moderate density (SWE 30mm). Stability test results from multiple locations: CT12-CT18 with Q1-Q2 sudden planar failures at the surface hoar interface. Extended column tests (ECTP15-20) demonstrate propagation potential across the weak layer. Rutschblock scores of RB3-RB4 confirm sensitivity. Spatial distribution: Most reactive on north through east aspects at treeline and alpine elevations. Below treeline shows better structure with forest anchoring. South and west aspects have melt-freeze crusts providing some stability. Primary concern: Human-triggered avalanches on wind-loaded terrain, steep convexities, and unsupported slopes. Size 2-2.5 avalanches possible. Recommend conservative terrain choices, avoid wind-loaded features, and careful snowpack assessment before committing to steep terrain.",
+    "attachments": [],
+    "locationUUIDs": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "operationUUID": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "state": "IN_REVIEW",
+    "shareLevel": "PRIVATE"
+  },
+
+  "_snowpack_assessment_guidance": {
+    "description": "Best practices for snowpack assessment summaries",
+    "purpose": "High-level overview of snowpack conditions across the forecast area, not location-specific details",
+    "key_elements": [
+      "Overall snowpack structure and layering",
+      "Weak layers of concern (type, depth, characteristics)",
+      "Recent loading or weather impacts",
+      "Stability test summary (general results, not detailed individual tests)",
+      "Spatial distribution of concerns (aspects, elevations)",
+      "Expected avalanche character and size",
+      "Travel advice and terrain recommendations"
+    ],
+    "contrast_with_snowpack_observation": {
+      "snowpack_observation": "Location-specific with GPS coordinates, detailed test results, slope angle, aspect, elevation at specific test site",
+      "snowpack_assessment": "Broad summary across forecast area, general stability trends, overall structure and concerns"
+    }
+  },
+
+  "_llm_guidance": {
+    "summary_construction": "Synthesize information from multiple snowpack observations into a comprehensive area-wide assessment. Include weak layer identification, spatial distribution, stability trends, and actionable travel advice.",
+    "key_information_priority": [
+      "1. Weak layer identification (type, depth, characteristics)",
+      "2. Spatial distribution (which aspects/elevations most affected)",
+      "3. Stability test trends (not individual results, but overall patterns)",
+      "4. Recent changes (loading, temperature, wind effects)",
+      "5. Avalanche character and expected size",
+      "6. Travel recommendations"
+    ],
+    "length_recommendation": "200-500 words typical. Comprehensive but concise. Focus on actionable information for field teams.",
+    "tone": "Professional, clear, actionable. Avoid ambiguity in key safety messages."
+  }
+}
+
