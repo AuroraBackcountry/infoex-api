@@ -30,13 +30,14 @@ class Settings(BaseSettings):
     
     # InfoEx Staging Configuration
     staging_api_key: Optional[str] = Field(default=None, description="Staging API key")
-    staging_operation_uuid: Optional[str] = Field(default=None, description="Staging operation UUID")
     staging_url: str = Field(default="https://staging-can.infoex.ca/safe-server")
     
     # InfoEx Production Configuration
     production_api_key: Optional[str] = Field(default=None, description="Production API key")
-    production_operation_uuid: Optional[str] = Field(default=None, description="Production operation UUID")
     production_url: str = Field(default="https://can.infoex.ca/safe-server")
+    
+    # Shared InfoEx Configuration
+    operation_uuid: str = Field(..., description="Aurora Backcountry operation UUID")
     
     # Active InfoEx Configuration (set based on environment)
     infoex_api_key: Optional[str] = Field(default=None, description="Active InfoEx API key")
@@ -84,12 +85,13 @@ class Settings(BaseSettings):
         # Set active InfoEx configuration based on environment
         if env == "production":
             self.infoex_api_key = self.production_api_key or self.infoex_api_key
-            self.infoex_operation_uuid = self.production_operation_uuid or self.infoex_operation_uuid
             self.infoex_base_url = self.production_url
         else:  # Default to staging
             self.infoex_api_key = self.staging_api_key or self.infoex_api_key
-            self.infoex_operation_uuid = self.staging_operation_uuid or self.infoex_operation_uuid
             self.infoex_base_url = self.staging_url
+        
+        # Operation UUID is the same for both environments
+        self.infoex_operation_uuid = self.operation_uuid
         
         # Validate that we have required InfoEx credentials
         if not self.infoex_api_key:

@@ -18,34 +18,37 @@ or
 ENVIRONMENT=production
 ```
 
-### 3. **InfoEx Credentials** (Required based on ENVIRONMENT)
+### 3. **Operation UUID** (Required - same for both environments)
+```
+OPERATION_UUID=your-aurora-operation-uuid
+```
+
+### 4. **InfoEx API Keys** (Required based on ENVIRONMENT)
 
 #### For Staging:
 ```
 STAGING_API_KEY=your-staging-api-key
-STAGING_OPERATION_UUID=your-staging-operation-uuid
 ```
 
 #### For Production:
 ```
 PRODUCTION_API_KEY=your-production-api-key
-PRODUCTION_OPERATION_UUID=your-production-operation-uuid
 ```
 
-### 4. **CORS Origins** (Required)
+### 5. **CORS Origins** (Required)
 ```
 CORS_ALLOWED_ORIGINS=["https://your-n8n-instance.com"]
 ```
 Note: This should be a JSON array string
 
-### 5. **Redis** (Your External Instance)
+### 6. **Redis** (Your External Instance)
 Since you're using your own Redis for shared context with n8n:
 ```
 REDIS_URL=redis://username:password@your-redis-host.com:6379/0
 ```
 Note: Do NOT add Render's Redis addon - use your existing Redis instance
 
-### 6. **Redis Session Prefix** (Optional)
+### 7. **Redis Session Prefix** (Optional)
 If n8n uses different key format:
 ```
 REDIS_SESSION_PREFIX=session
@@ -95,8 +98,9 @@ CLAUDE_TEMPERATURE=0.3
 ```
 ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxx
 ENVIRONMENT=staging
+OPERATION_UUID=uuid-1234-5678-aurora
 STAGING_API_KEY=abcd1234-staging-key
-STAGING_OPERATION_UUID=uuid-1234-5678-staging
+REDIS_URL=redis://user:pass@my-redis.com:6379
 CORS_ALLOWED_ORIGINS=["https://n8n.mydomain.com"]
 LOG_LEVEL=INFO
 ```
