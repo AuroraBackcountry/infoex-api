@@ -68,13 +68,15 @@ class Settings(BaseSettings):
     @validator("cors_allowed_origins", pre=True)
     def parse_cors_origins(cls, v):
         """Parse CORS origins from string or list"""
+        if v is None or v == "":
+            return ["http://localhost:5678"]
         if isinstance(v, str):
             # Try to parse as JSON first
             try:
                 return json.loads(v)
             except json.JSONDecodeError:
                 # Otherwise split by comma
-                return [origin.strip() for origin in v.split(",")]
+                return [origin.strip() for origin in v.split(",") if origin.strip()]
         return v
     
     @model_validator(mode='after')
