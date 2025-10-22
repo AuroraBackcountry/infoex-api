@@ -82,14 +82,15 @@ Process a conversational message to build InfoEx payloads.
 **Request:**
 ```json
 {
-    "session_id": "unique-session-id",
+    "session_id": "28f2849a-d476-4186-a41e-cf116db481c8",
     "message": "I observed a size 2 storm slab avalanche today",
     "fixed_values": {
         "operation_id": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
         "location_uuids": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
         "zone_name": "Whistler Blackcomb",
         "date": "10/06/2025",
-        "guide_names": ["John Smith", "Jane Doe"]
+        "user_name": "Ben Johns",
+        "user_id": "93576f96-fe5f-4e97-91e4-bd22560da051"
     }
 }
 ```
@@ -205,7 +206,8 @@ Configure your n8n HTTP Request node as follows:
           "location_uuids": "={{ $json.location_uuids }}",
           "zone_name": "={{ $json.zone_name }}",
           "date": "={{ $now.format('MM/dd/yyyy') }}",
-          "guide_names": "={{ $json.guide_names }}"
+          "user_name": "={{ $json.user_name }}",
+          "user_id": "={{ $json.user_id }}"
         }
       }
     ]

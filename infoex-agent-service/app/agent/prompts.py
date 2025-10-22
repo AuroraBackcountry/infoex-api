@@ -67,7 +67,7 @@ Current fixed values for this session:
 - Location UUIDs: {location_uuids}
 - Zone: {zone_name}
 - Date: {date}
-- Guides: {guide_names}
+- Submitted by: {user_name}
 """
 
 
@@ -79,5 +79,5 @@ def build_system_prompt(fixed_values, constants_formatter) -> str:
         location_uuids=", ".join(fixed_values.location_uuids),
         zone_name=fixed_values.zone_name,
         date=fixed_values.date,
-        guide_names=", ".join(fixed_values.guide_names) if fixed_values.guide_names else "Not specified"
+        user_name=fixed_values.user_name if fixed_values.user_name else "Not specified"
     )
