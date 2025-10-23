@@ -72,18 +72,44 @@ This is the exact format n8n should send to the Claude microservice:
 3. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
 4. **Date Format**: Must be MM/DD/YYYY (e.g., "10/22/2025")
 
-## Response Format
+## Two-Step Process
 
-Claude will respond with plain text:
+### Step 1: Process Report Response
+Claude validates and responds:
 ```json
 {
-  "response": "I've parsed the avalanche observation. Size 3 on north aspect. Ready to submit to InfoEx."
+  "response": "Payload validated and ready for avalanche observation submission"
 }
 ```
 
-Or if more info needed:
+### Step 2: Submit to InfoEx
+After Claude validates, call the submission endpoint:
 ```json
+POST /api/submit-to-infoex
 {
-  "response": "I need a few more details: What was the trigger type? What elevation?"
+  "session_id": "28f2849a-d476-4186-a41e-cf116db481c8",
+  "submission_types": ["avalanche_observation"]
 }
 ```
+
+### Submission Response
+```json
+{
+  "success": true,
+  "message": "Processed 1 submissions. All successful! Details: avalanche_observation: Submitted (UUID: 123e4567)",
+  "submissions": [
+    {
+      "observation_type": "avalanche_observation",
+      "success": true,
+      "result": {"uuid": "123e4567-e89b-12d3-a456-426614174000"}
+    }
+  ]
+}
+```
+
+## n8n Workflow
+
+1. **HTTP Request 1**: Call `/api/process-report` with message
+2. **If Node**: Check if response contains "ready for submission"
+3. **HTTP Request 2**: If ready, call `/api/submit-to-infoex`
+4. **Set Node**: Extract UUID from submission response
