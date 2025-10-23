@@ -8,7 +8,7 @@ import structlog
 import uuid
 
 from app.config import settings
-from app.models import Session, FixedValues, ConversationMessage
+from app.models import Session, RequestValues, ConversationMessage
 
 logger = structlog.get_logger()
 
@@ -48,7 +48,7 @@ class SessionManager:
         """Generate Redis key for session"""
         return f"{settings.redis_session_prefix}:{session_id}"
     
-    async def create_session(self, fixed_values: FixedValues) -> Session:
+    async def create_session(self, request_values: RequestValues) -> Session:
         """Create a new session"""
         session_id = str(uuid.uuid4())
         now = datetime.utcnow()
@@ -57,7 +57,7 @@ class SessionManager:
             session_id=session_id,
             created_at=now,
             last_updated=now,
-            fixed_values=fixed_values,
+            request_values=request_values,
             conversation_history=[],
             payloads={},
             metadata={}
@@ -68,7 +68,7 @@ class SessionManager:
         
         logger.info("session_created", 
                    session_id=session_id,
-                   zone=fixed_values.zone_name)
+                   zone=request_values.zone_name)
         
         return session
     

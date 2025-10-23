@@ -6,7 +6,7 @@ from datetime import datetime
 import re
 
 
-class FixedValues(BaseModel):
+class RequestValues(BaseModel):
     """Request-specific values provided by n8n for this submission"""
     operation_id: str = Field(..., description="InfoEx operation UUID")
     location_uuids: List[str] = Field(..., description="List of location UUIDs")
@@ -41,7 +41,7 @@ class ProcessReportRequest(BaseModel):
     """Request model for processing a report message"""
     session_id: str = Field(..., description="Unique session identifier")
     message: str = Field(..., description="User message to process")
-    fixed_values: FixedValues = Field(..., description="Fixed values from n8n")
+    request_values: RequestValues = Field(..., description="Request-specific values from n8n")
     auto_submit: bool = Field(default=True, description="Automatically submit to InfoEx when ready")
 
 
@@ -107,7 +107,7 @@ class Session(BaseModel):
     session_id: str
     created_at: datetime
     last_updated: datetime
-    fixed_values: FixedValues
+    request_values: RequestValues
     conversation_history: List[ConversationMessage] = Field(default_factory=list)
     payloads: Dict[str, PayloadStatus] = Field(default_factory=dict)
     metadata: Dict[str, Any] = Field(default_factory=dict)

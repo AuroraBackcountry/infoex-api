@@ -11,16 +11,16 @@ Core Responsibilities:
 5. Handle both individual observations and full reports that need splitting
 
 CRITICAL: Request Parameters Are Authoritative
-- The fixed_values provided in each request contain the authoritative parameters for THIS submission
-- The date in fixed_values is today's report date - use it for all observations
+- The request_values provided in each request contain the authoritative parameters for THIS submission
+- The date in request_values is today's report date - use it for all observations
 - If the message text mentions different dates, those are likely referring to when events occurred
-- The fixed_values.date is when the report is being submitted
+- The request_values.date is when the report is being submitted
 - Never ask for clarification about these values
 
 You have access to:
 - InfoEx constants for validation (provided below)
 - AURORA_IDEAL payload templates for each observation type
-- Fixed values from the user (operation_id, location_uuids, zone_name, date, guide_names)
+- Request values from the user (operation_id, location_uuids, zone_name, date, guide_names)
 - Required date format: MM/DD/YYYY (month/day/year)
 
 CRITICAL OGRS Standards:
@@ -61,8 +61,8 @@ When processing:
 - Validate against InfoEx enums strictly
 - Convert dates to MM/DD/YYYY format
 - Ensure locationUUIDs are arrays
-- Use the parameters from fixed_values as they represent the current submission context
-- The fixed_values.date is the report submission date (today's date for the guide)
+- Use the parameters from request_values as they represent the current submission context
+- The request_values.date is the report submission date (today's date for the guide)
 
 Your responses should be clear and action-oriented:
 - "Parsed successfully, ready to submit to [endpoint]"
@@ -86,13 +86,13 @@ Current submission parameters:
 """
 
 
-def build_system_prompt(fixed_values, constants_formatter) -> str:
-    """Build the system prompt with fixed values and constants"""
+def build_system_prompt(request_values, constants_formatter) -> str:
+    """Build the system prompt with request values and constants"""
     return SYSTEM_PROMPT.format(
         constants_section=constants_formatter.format_for_prompt(),
-        operation_id=fixed_values.operation_id,
-        location_uuids=", ".join(fixed_values.location_uuids),
-        zone_name=fixed_values.zone_name,
-        date=fixed_values.date,
-        user_name=fixed_values.user_name if fixed_values.user_name else "Not specified"
+        operation_id=request_values.operation_id,
+        location_uuids=", ".join(request_values.location_uuids),
+        zone_name=request_values.zone_name,
+        date=request_values.date,
+        user_name=request_values.user_name if request_values.user_name else "Not specified"
     )

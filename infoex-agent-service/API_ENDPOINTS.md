@@ -24,12 +24,13 @@
   {
     "session_id": "unique-session-id",
     "message": "Submit avalanche observation size 3 at Glacier Bowl...",
-    "fixed_values": {
-      "operation_id": "uuid",
-      "location_uuids": ["uuid1", "uuid2"],
-      "zone_name": "Whistler",
-      "date": "10/22/2025",
-      "guide_names": ["John Doe"]
+    "request_values": {
+      "operation_id": "your-operation-uuid-here",
+      "location_uuids": ["location-uuid-1", "location-uuid-2"],
+      "zone_name": "Your Zone Name",
+      "date": "MM/DD/YYYY",
+      "user_name": "Guide Name",
+      "user_id": "guide-user-uuid"
     }
   }
   ```
@@ -115,7 +116,7 @@
       {
         "uuid": "location-uuid",
         "name": "Glacier Bowl",
-        "zone": "Whistler"
+        "zone": "Your Zone Name"
       }
     ],
     "count": 15

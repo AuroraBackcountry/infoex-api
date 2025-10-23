@@ -137,10 +137,10 @@ class PayloadBuilder:
         # Merge session data
         payload.update(payload_status.data)
         
-        # Add fixed values
-        payload["obDate"] = session.fixed_values.date
-        payload["locationUUIDs"] = session.fixed_values.location_uuids
-        payload["operationUUID"] = session.fixed_values.operation_id
+        # Add request values
+        payload["obDate"] = session.request_values.date
+        payload["locationUUIDs"] = session.request_values.location_uuids
+        payload["operationUUID"] = session.request_values.operation_id
         
         # Ensure state is set
         if "state" not in payload:

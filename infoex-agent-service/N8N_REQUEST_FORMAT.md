@@ -8,13 +8,13 @@ This is the exact format n8n should send to the Claude microservice:
 {
   "session_id": "28f2849a-d476-4186-a41e-cf116db481c8",
   "message": "Submit avalanche observation - size 3 at north aspect",
-  "fixed_values": {
+  "request_values": {
     "operation_id": "your-aurora-operation-uuid",
     "location_uuids": ["location-uuid-1", "location-uuid-2"],
-    "zone_name": "Whistler Blackcomb",
-    "date": "10/22/2025",
-    "user_name": "Ben Johns",
-    "user_id": "93576f96-fe5f-4e97-91e4-bd22560da051"
+    "zone_name": "Your Zone Name",
+    "date": "MM/DD/YYYY",
+    "user_name": "Guide Name",
+    "user_id": "guide-user-uuid"
   }
 }
 ```
@@ -25,10 +25,10 @@ This is the exact format n8n should send to the Claude microservice:
 |-------|------|----------|-------------|
 | `session_id` | string | Yes | The conversation session ID from n8n |
 | `message` | string | Yes | The current message/instruction for Claude |
-| `fixed_values` | object | Yes | Context data that Claude needs |
+| `request_values` | object | Yes | Request-specific data for this submission |
 | → `operation_id` | string | Yes | Aurora Backcountry operation UUID |
 | → `location_uuids` | array | Yes | Array of location UUIDs |
-| → `zone_name` | string | Yes | Zone name (e.g., "Whistler Blackcomb") |
+| → `zone_name` | string | Yes | Zone name (e.g., "Your Zone Name") |
 | → `date` | string | Yes | Report date in MM/DD/YYYY format |
 | → `user_name` | string | No | Name of the user submitting |
 | → `user_id` | string | No | UUID of the user |
@@ -70,7 +70,7 @@ This is the exact format n8n should send to the Claude microservice:
 1. **Session ID**: This should match what's in your Redis database
 2. **User Info**: Claude will include the user name in submissions
 3. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
-4. **Date Format**: Must be MM/DD/YYYY (e.g., "10/22/2025")
+4. **Date Format**: Must be MM/DD/YYYY
 
 ## Single-Step Process (Default)
 
@@ -79,16 +79,16 @@ With `auto_submit: true` (default), the service validates AND submits in one cal
 ### Request:
 ```json
 {
-  "session_id": "28f2849a-d476-4186-a41e-cf116db481c8",
+  "session_id": "your-session-id-here",
   "message": "Submit avalanche observation - size 3 at north aspect",
   "auto_submit": true,  // Optional, defaults to true
-  "fixed_values": {
+  "request_values": {
     "operation_id": "your-aurora-operation-uuid",
     "location_uuids": ["location-uuid-1"],
-    "zone_name": "Whistler Blackcomb",
-    "date": "10/22/2025",
-    "user_name": "Ben Johns",
-    "user_id": "93576f96-fe5f-4e97-91e4-bd22560da051"
+    "zone_name": "Your Zone Name",
+    "date": "MM/DD/YYYY",
+    "user_name": "Guide Name",
+    "user_id": "guide-user-uuid"
   }
 }
 ```
@@ -109,7 +109,7 @@ To validate without submitting, set `auto_submit: false`:
   "session_id": "test-123",
   "message": "Check this avalanche observation...",
   "auto_submit": false,
-  "fixed_values": {...}
+  "request_values": {...}
 }
 ```
 

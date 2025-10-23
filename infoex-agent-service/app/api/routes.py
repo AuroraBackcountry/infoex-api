@@ -37,8 +37,8 @@ async def process_report(request: ProcessReportRequest):
         session = await session_manager.get_session(request.session_id)
         
         if not session:
-            # Create new session with fixed values
-            session = await session_manager.create_session(request.fixed_values)
+            # Create new session with request values
+            session = await session_manager.create_session(request.request_values)
             # Update session ID to match request
             session.session_id = request.session_id
             await session_manager.save_session(session)

@@ -4,6 +4,7 @@
 import requests
 import json
 import sys
+import os
 from datetime import datetime
 
 # Service URL (adjust if needed)
@@ -26,10 +27,10 @@ def test_conversation():
     session_id = f"test-session-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
     
     # Fixed values for testing
-    fixed_values = {
-        "operation_id": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
-        "location_uuids": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
-        "zone_name": "Whistler Blackcomb",
+    request_values = {
+        "operation_id": os.getenv("TEST_OPERATION_ID", "test-operation-uuid"),
+        "location_uuids": [os.getenv("TEST_LOCATION_UUID", "test-location-uuid")],
+        "zone_name": os.getenv("TEST_ZONE_NAME", "Test Zone"),
         "date": datetime.now().strftime("%m/%d/%Y"),
         "guide_names": ["Test Guide"]
     }
@@ -45,7 +46,7 @@ def test_conversation():
         json={
             "session_id": session_id,
             "message": message1,
-            "fixed_values": fixed_values
+            "request_values": request_values
         }
     )
     
@@ -65,7 +66,7 @@ def test_conversation():
         json={
             "session_id": session_id,
             "message": message2,
-            "fixed_values": fixed_values
+            "request_values": request_values
         }
     )
     

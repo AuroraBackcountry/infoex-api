@@ -8,7 +8,7 @@ from datetime import datetime
 
 from app.config import settings
 from app.models import (
-    FixedValues, 
+    RequestValues, 
     ConversationMessage, 
     Session,
     PayloadStatus
@@ -47,9 +47,9 @@ class ClaudeAgent:
         # Build messages for Claude
         messages = self._build_claude_messages(session)
         
-        # Get system prompt with fixed values
+        # Get system prompt with request values
         system_prompt = build_system_prompt(
-            session.fixed_values,
+            session.request_values,
             infoex_constants
         )
         
@@ -162,9 +162,9 @@ class ClaudeAgent:
                     status="incomplete",
                     missing_fields=infoex_constants.get_required_fields(obs_type),
                     data={
-                        "obDate": session.fixed_values.date,
-                        "locationUUIDs": session.fixed_values.location_uuids,
-                        "operationUUID": session.fixed_values.operation_id,
+                        "obDate": session.request_values.date,
+                        "locationUUIDs": session.request_values.location_uuids,
+                        "operationUUID": session.request_values.operation_id,
                         "state": "IN_REVIEW"
                     }
                 )
