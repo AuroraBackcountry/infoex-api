@@ -86,7 +86,9 @@ class InfoExClient:
                             "status": "success",
                             "uuid": result.get("uuid"),
                             "observation_type": observation_type,
-                            "submitted_at": datetime.utcnow().isoformat()
+                            "submitted_at": datetime.utcnow().isoformat(),
+                            "status_code": response.status_code,
+                            "response": result
                         }
                     else:
                         # 200 response but no UUID - likely an error

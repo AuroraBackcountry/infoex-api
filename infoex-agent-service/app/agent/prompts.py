@@ -132,6 +132,7 @@ avalanche_summary: Successfully submitted to InfoEx
   - UUID: [unique-identifier]
   - State: IN_REVIEW (when auto_submit=false)
   - State: SUBMITTED (when auto_submit=true)
+  - Response Code: 200
 ```
 This clear format helps the n8n agent understand both the submission ID and state.
 

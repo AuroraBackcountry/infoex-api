@@ -105,11 +105,16 @@ async def process_report(request: ProcessReportRequest):
                             submission_results.append(
                                 f"{obs_type}: Successfully submitted to InfoEx\n"
                                 f"  - UUID: {result.get('uuid')}\n"
-                                f"  - State: {submission_state}"
+                                f"  - State: {submission_state}\n"
+                                f"  - Response Code: {result.get('status_code', 200)}"
                             )
                             updated_session.payloads[obs_type].status = "submitted"
                         else:
-                            submission_results.append(f"{obs_type}: Failed - {result.get('error', 'Unknown error')}")
+                            error_msg = result.get('error', 'Unknown error')
+                            if 'status_code' in result:
+                                submission_results.append(f"{obs_type}: Failed - {error_msg} (Response Code: {result['status_code']})")
+                            else:
+                                submission_results.append(f"{obs_type}: Failed - {error_msg}")
                     else:
                         submission_results.append(f"{obs_type}: Validation errors - {', '.join(errors)}")
                 
