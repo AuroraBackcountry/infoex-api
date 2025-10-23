@@ -265,13 +265,55 @@ class ClaudeAgent:
                     
                     # Field mapping corrections for common mistakes
                     field_mappings = {
+                        # Common date field mappings
                         "observationDateTime": "obDate",
                         "observationDate": "obDate",
                         "date": "obDate",
+                        
+                        # Common field name variations
+                        "operation_id": "operationUUID",
+                        "location_uuids": "locationUUIDs",
+                        "operationId": "operationUUID",
+                        
+                        # avalanche_summary specific
                         "avalanches_observed": "avalanchesObserved",
                         "percent_area_observed": "percentAreaObserved",
-                        "operation_id": "operationUUID",
-                        "location_uuids": "locationUUIDs"
+                        "percentArea": "percentAreaObserved",
+                        
+                        # avalanche_observation specific
+                        "observation_time": "obTime",
+                        "number": "num",
+                        "avalanche_type": "character",
+                        "type": "character",
+                        "min_size": "sizeMin",
+                        "max_size": "sizeMax",
+                        "depth_average": "depthAvg",
+                        "depth_min": "depthMin",
+                        "depth_max": "depthMax",
+                        
+                        # field_summary specific
+                        "start_time": "obStartTime",
+                        "end_time": "obEndTime",
+                        "temperature_high": "tempHigh",
+                        "temperature_low": "tempLow",
+                        "wind_speed": "windSpeed",
+                        "wind_direction": "windDirection",
+                        "sky_condition": "sky",
+                        "precipitation": "precip",
+                        "new_snow_24h": "hn24",
+                        "snow_height": "hs",
+                        
+                        # hazard_assessment specific
+                        "assessment_time": "obTime",
+                        "type": "assessmentType",
+                        "problems": "avalancheProblems",
+                        "ratings": "hazardRatings",
+                        
+                        # terrain_observation specific
+                        "ates": "atesRating",
+                        "terrain": "terrainFeature",
+                        "mindset": "strategicMindset",
+                        "percent_observed": "percentAreaObserved"
                     }
                     
                     # Apply field mappings
@@ -281,11 +323,8 @@ class ClaudeAgent:
                         correct_key = field_mappings.get(key, key)
                         corrected_data[correct_key] = value
                     
-                    # Special handling for avalanchesObserved boolean to enum
-                    if obs_type == "avalanche_summary" and "avalanchesObserved" in corrected_data:
-                        val = corrected_data["avalanchesObserved"]
-                        if isinstance(val, bool) or str(val).lower() in ["yes", "true"]:
-                            corrected_data["avalanchesObserved"] = "New avalanches" if val else "No new avalanches"
+                    # Apply observation-type specific value conversions
+                    corrected_data = self._apply_value_conversions(obs_type, corrected_data)
                     
                     logger.info("extracted_json_from_claude", 
                                observation_type=obs_type,
@@ -321,6 +360,150 @@ class ClaudeAgent:
                     extracted["obEndTime"] = time_match.group(1)
         
         return extracted
+    
+    def _apply_value_conversions(self, obs_type: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply observation-type specific value conversions"""
+        
+        # avalanche_summary conversions
+        if obs_type == "avalanche_summary":
+            # Convert boolean/yes/no to proper enum
+            if "avalanchesObserved" in data:
+                val = data["avalanchesObserved"]
+                if isinstance(val, bool) or str(val).lower() in ["yes", "true", "1"]:
+                    data["avalanchesObserved"] = "New avalanches"
+                elif str(val).lower() in ["no", "false", "0"]:
+                    data["avalanchesObserved"] = "No new avalanches"
+                elif str(val).lower() in ["sluffing", "pinwheeling"]:
+                    data["avalanchesObserved"] = "Sluffing/Pinwheeling only"
+            
+            # Ensure percentAreaObserved is numeric
+            if "percentAreaObserved" in data and isinstance(data["percentAreaObserved"], str):
+                try:
+                    data["percentAreaObserved"] = float(data["percentAreaObserved"])
+                except:
+                    pass
+        
+        # avalanche_observation conversions
+        elif obs_type == "avalanche_observation":
+            # Convert trigger descriptions to codes
+            trigger_mappings = {
+                "natural": "Na", "skier": "Sa", "skier triggered": "Sa",
+                "snowmobile": "Ma", "explosive": "Xa", "cornice": "Nc",
+                "unknown": "U", "vehicle": "Va"
+            }
+            if "trigger" in data and data["trigger"].lower() in trigger_mappings:
+                data["trigger"] = trigger_mappings[data["trigger"].lower()]
+            
+            # Convert character codes to full names
+            character_mappings = {
+                "L": "LOOSE_DRY_AVALANCHE", "WL": "LOOSE_WET_AVALANCHE",
+                "SS": "STORM_SLAB", "WS": "WIND_SLAB", "PS": "PERSISTENT_SLAB",
+                "DPS": "DEEP_PERSISTENT_SLAB", "WS2": "WET_SLAB",
+                "G": "GLIDE", "C": "CORNICE", "U": "UNKNOWN",
+                "storm slab": "STORM_SLAB", "wind slab": "WIND_SLAB",
+                "wet slab": "WET_SLAB", "persistent slab": "PERSISTENT_SLAB", 
+                "deep persistent": "DEEP_PERSISTENT_SLAB", "cornice": "CORNICE",
+                "glide": "GLIDE", "loose dry": "LOOSE_DRY_AVALANCHE",
+                "loose wet": "LOOSE_WET_AVALANCHE"
+            }
+            if "character" in data:
+                char_val = str(data["character"]).lower()
+                # First try lowercase lookup
+                if char_val in character_mappings:
+                    data["character"] = character_mappings[char_val]
+                # Then try uppercase code lookup
+                elif char_val.upper() in character_mappings:
+                    data["character"] = character_mappings[char_val.upper()]
+                # Finally try to match by checking if it already has the right format
+                elif char_val.upper().replace(" ", "_") in ["LOOSE_DRY_AVALANCHE", "LOOSE_WET_AVALANCHE",
+                                                             "STORM_SLAB", "WIND_SLAB", "PERSISTENT_SLAB",
+                                                             "DEEP_PERSISTENT_SLAB", "WET_SLAB", "GLIDE",
+                                                             "CORNICE", "UNKNOWN"]:
+                    data["character"] = char_val.upper().replace(" ", "_")
+            
+            # Ensure size is string
+            if "size" in data:
+                data["size"] = str(data["size"])
+            
+            # Ensure aspects are arrays
+            if "aspectFrom" in data and isinstance(data["aspectFrom"], list):
+                data["aspectFrom"] = data["aspectFrom"][0] if data["aspectFrom"] else "N"
+            if "aspectTo" in data and isinstance(data["aspectTo"], list):
+                data["aspectTo"] = data["aspectTo"][-1] if data["aspectTo"] else "N"
+        
+        # field_summary conversions
+        elif obs_type == "field_summary":
+            # Wind speed mappings
+            wind_mappings = {
+                "calm": "C", "light": "L", "moderate": "M",
+                "strong": "S", "extreme": "X", "variable": "V"
+            }
+            for field in ["windSpeed", "amWindSpeed", "pmWindSpeed"]:
+                if field in data and isinstance(data[field], str):
+                    wind_val = data[field].lower()
+                    if wind_val in wind_mappings:
+                        data[field] = wind_mappings[wind_val]
+            
+            # Sky condition mappings
+            sky_mappings = {
+                "clear": "CLR", "few": "FEW", "scattered": "SCT",
+                "broken": "BKN", "overcast": "OVC", "obscured": "X"
+            }
+            for field in ["sky", "amSky", "pmSky"]:
+                if field in data and isinstance(data[field], str):
+                    sky_val = data[field].lower()
+                    if sky_val in sky_mappings:
+                        data[field] = sky_mappings[sky_val]
+            
+            # Precipitation mappings
+            if "precip" in data:
+                precip_val = str(data["precip"]).lower()
+                if "no" in precip_val or "nil" in precip_val:
+                    data["precip"] = "NIL"
+                elif "light snow" in precip_val:
+                    data["precip"] = "S1"
+                elif "moderate snow" in precip_val:
+                    data["precip"] = "S2"
+                elif "heavy snow" in precip_val:
+                    data["precip"] = "S3"
+                elif "rain" in precip_val:
+                    data["precip"] = "R"
+        
+        # terrain_observation conversions
+        elif obs_type == "terrain_observation":
+            # ATES rating normalization
+            if "atesRating" in data:
+                ates_val = str(data["atesRating"]).title()
+                if ates_val in ["Simple", "Challenging", "Complex"]:
+                    data["atesRating"] = ates_val
+            
+            # Strategic mindset normalization
+            mindset_mappings = {
+                "assessment": "Assessment", "stepping out": "Stepping Out",
+                "status quo": "Status Quo", "stepping back": "Stepping Back",
+                "maintenance": "Maintenance", "entrenchment": "Entrenchment",
+                "open season": "Open Season", "spring diurnal": "Spring Diurnal"
+            }
+            if "strategicMindset" in data and data["strategicMindset"].lower() in mindset_mappings:
+                data["strategicMindset"] = mindset_mappings[data["strategicMindset"].lower()]
+        
+        # Common conversions for all types
+        # Ensure locationUUIDs is always an array
+        if "locationUUIDs" in data and not isinstance(data["locationUUIDs"], list):
+            data["locationUUIDs"] = [data["locationUUIDs"]]
+        
+        # Ensure numeric values are proper type
+        numeric_fields = ["tempHigh", "tempLow", "elevationMin", "elevationMax",
+                         "hs", "hn24", "hst", "percentAreaObserved", "sizeMin", "sizeMax",
+                         "depthMin", "depthMax", "depthAvg", "width", "length"]
+        for field in numeric_fields:
+            if field in data and isinstance(data[field], str):
+                try:
+                    data[field] = float(data[field])
+                except:
+                    pass
+        
+        return data
     
     def get_template_for_type(self, observation_type: str) -> Optional[Dict[str, Any]]:
         """Get AURORA_IDEAL template for observation type"""

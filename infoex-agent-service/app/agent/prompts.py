@@ -42,12 +42,40 @@ Available observation types and their purposes:
 - terrain_observation: Terrain use and strategic mindset
 - pwl_persistent_weak_layer: Seasonal weak layer tracking
 
-CRITICAL Field Mapping for avalanche_summary:
+CRITICAL Field Mappings by Observation Type:
+
+1. avalanche_summary:
 - "avalanches observed: yes" → avalanchesObserved: "New avalanches"
 - "avalanches observed: no" → avalanchesObserved: "No new avalanches"
 - "percent area observed: 20" → percentAreaObserved: 20 (numeric)
-- Use obDate NOT observationDateTime
-- Always use the exact field names from the InfoEx API
+
+2. avalanche_observation:
+- "skier triggered" → trigger: "Sa"
+- "natural" → trigger: "Na"
+- "storm slab" or "SS" → character: "STORM_SLAB"
+- "wind slab" or "WS" → character: "WIND_SLAB"
+- Size must be string: "2" not 2
+- aspectFrom/aspectTo are single values, not arrays
+
+3. field_summary:
+- "strong wind" → windSpeed: "S"
+- "overcast" → sky: "OVC"
+- "light snow" → precip: "S1"
+- Times in 24hr format: "08:30"
+- Temperatures are numeric
+
+4. terrain_observation:
+- "complex terrain" → atesRating: "Complex"
+- "status quo" → strategicMindset: "Status Quo"
+
+5. hazard_assessment:
+- location must be JSON string with elevation bands
+- hazardChart must be JSON string with x/y values
+- distribution: "Isolated", "Specific", or "Widespread"
+- sensitivity: "Unreactive", "Stubborn", "Reactive", or "Touchy"
+
+Always use obDate NOT observationDateTime
+Always use exact InfoEx field names from the templates
 
 Aurora-specific constraints:
 - No explosives or control work (backcountry guiding only)
