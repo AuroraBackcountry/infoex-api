@@ -140,15 +140,34 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
         example_body = None
         field_descriptions = None
     
+    # Extract the specific missing/invalid fields
+    missing_fields = []
+    invalid_fields = []
+    for error in exc.errors():
+        if error["type"] == "missing":
+            missing_fields.append(".".join(str(loc) for loc in error["loc"]))
+        else:
+            invalid_fields.append({
+                "field": ".".join(str(loc) for loc in error["loc"]),
+                "issue": error["msg"],
+                "type": error["type"]
+            })
+    
     return JSONResponse(
         status_code=422,
         content={
             "error": "Invalid request format",
-            "message": "Your request body is missing required fields or has invalid data",
+            "agent_message": "I need help fixing the request format. Please update your HTTP Request node.",
+            "missing_fields": missing_fields,
+            "invalid_fields": invalid_fields,
             "validation_errors": exc.errors(),
             "correct_format": example_body,
             "field_descriptions": field_descriptions,
-            "hint": "Copy the 'correct_format' object and replace the placeholder values with your actual data"
+            "instructions_for_n8n_agent": (
+                "Please update the HTTP Request body to match the 'correct_format' structure. "
+                "The most common issue is using 'fixed_values' instead of 'request_values'. "
+                "Make sure all fields in 'missing_fields' are included."
+            )
         }
     )
 
