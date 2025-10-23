@@ -34,14 +34,6 @@ When using the Claude HTTP Request tool:
 - Pass the observation data in the `message` field
 - The Claude tool tracks its own processing context across multiple calls
 
-### Optional Context Passing
-
-If helpful, you can include a summary of relevant user context in the `conversation_context` field:
-```json
-{
-  "conversation_context": "User reported size 3 avalanche on north aspect at 2100m with natural trigger"
-}
-```
 
 ## Observation Types and Required Information
 
@@ -365,8 +357,7 @@ If user asks "show me the payload", display the full JSON that will be sent:
     "zone_name": "Your Zone",
     "date": "10/23/2025"
   },
-  "auto_submit": false,  // false = IN_REVIEW (draft), true = SUBMITTED (final)
-  "submission_state": "IN_REVIEW"  // Optional: Override draft/final state
+  "auto_submit": false  // false = IN_REVIEW (draft), true = SUBMITTED (final)
 }
 ```
 
@@ -434,8 +425,6 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 
 ### Body Parameters (Add these as individual fields):
 
-**Required Fields:**
-
 | Name | Value | Type | Description |
 |------|-------|------|-------------|
 | `session_id` | `{{ $json.sessionId }}` | Expression | Your conversation session ID |
@@ -445,13 +434,6 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 | `request_values.location_uuids[0]` | `{{ $json.location_uuids[0] }}` | Expression | First location UUID |
 | `request_values.zone_name` | `{{ $json.zone_name }}` | Expression | Zone/area name |
 | `request_values.date` | `{{ $now.format('MM/dd/yyyy') }}` | Expression | Observation date |
-
-**Optional Fields:**
-
-| Name | Value | Type | Description |
-|------|-------|------|-------------|
-| `conversation_context` | `{{ $json.user_context_summary }}` | Expression | Summary of user context |
-| `submission_state` | `IN_REVIEW` | Fixed | Override submission state (IN_REVIEW or SUBMITTED) |
 
 **Notes for n8n Configuration:**
 - For arrays like `location_uuids`, you need to add each element separately:
@@ -468,14 +450,6 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 4. `location_uuids` must be an array (even if just one location)
 5. Date must be in MM/DD/YYYY format
 
-### Submission State Control (Optional)
-Add `submission_state` to override whether observations are drafts or final:
-- **"IN_REVIEW"**: Save as draft for review (default)
-- **"SUBMITTED"**: Mark as final/complete
-
-This parameter is optional. If not included, the service uses its environment default.
-
-In the future, your web app will have a toggle to control this per submission.
 
 ### Example Complete Request:
 ```json

@@ -2,9 +2,7 @@
 
 ## Quick Copy-Paste Fields for n8n HTTP Request Node
 
-When configuring the Claude tool in n8n as an HTTP Request node with "Using Fields Below", add these fields:
-
-### Required Fields
+When configuring the Claude tool in n8n as an HTTP Request node with "Using Fields Below", add these 7 fields:
 
 1. **session_id**
    - Name: `session_id`
@@ -42,18 +40,6 @@ When configuring the Claude tool in n8n as an HTTP Request node with "Using Fiel
    - Value: `{{ $now.format('MM/dd/yyyy') }}`
    - Type: Expression
 
-### Optional Fields
-
-8. **conversation_context** (if you want to pass user context)
-   - Name: `conversation_context`
-   - Value: `{{ $json.user_context_summary }}`
-   - Type: Expression
-
-9. **submission_state** (to override draft/final state)
-   - Name: `submission_state`
-   - Value: `IN_REVIEW`
-   - Type: Fixed
-   - Note: Can be `IN_REVIEW` or `SUBMITTED`
 
 ### If You Have Multiple Locations
 
