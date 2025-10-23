@@ -46,7 +46,11 @@ class SessionManager:
     
     def _get_session_key(self, session_id: str) -> str:
         """Generate Redis key for session"""
-        return f"{settings.redis_session_prefix}:{session_id}"
+        if settings.redis_session_prefix:
+            return f"{settings.redis_session_prefix}:{session_id}"
+        else:
+            # No prefix - use session ID directly
+            return session_id
     
     async def create_session(self, request_values: RequestValues) -> Session:
         """Create a new session"""
