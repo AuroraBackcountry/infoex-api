@@ -85,30 +85,61 @@ class SessionManager:
         
         try:
             data = await self.redis.get(key)
-            if not data:
-                logger.warning("session_not_found", session_id=session_id)
-                return None
             
-            # Parse JSON and reconstruct session
-            session_data = json.loads(data)
+            # If session exists in Claude format, use it
+            if data:
+                # Parse JSON and reconstruct session
+                session_data = json.loads(data)
+                
+                # Convert datetime strings back to datetime objects
+                session_data['created_at'] = datetime.fromisoformat(session_data['created_at'])
+                session_data['last_updated'] = datetime.fromisoformat(session_data['last_updated'])
+                
+                # Convert conversation history
+                for msg in session_data.get('conversation_history', []):
+                    if 'timestamp' in msg:
+                        msg['timestamp'] = datetime.fromisoformat(msg['timestamp'])
+                
+                # Reconstruct Session object
+                session = Session(**session_data)
+                
+                logger.info("session_retrieved", 
+                           session_id=session_id,
+                           messages=len(session.conversation_history))
+                
+                return session
             
-            # Convert datetime strings back to datetime objects
-            session_data['created_at'] = datetime.fromisoformat(session_data['created_at'])
-            session_data['last_updated'] = datetime.fromisoformat(session_data['last_updated'])
+            # If no Claude session exists, check if n8n has stored conversation history
+            n8n_key = session_id
+            conversation_length = await self.redis.llen(n8n_key)
             
-            # Convert conversation history
-            for msg in session_data.get('conversation_history', []):
-                if 'timestamp' in msg:
-                    msg['timestamp'] = datetime.fromisoformat(msg['timestamp'])
+            if conversation_length > 0:
+                logger.info("session_found_in_n8n_format", 
+                           session_id=session_id,
+                           messages=conversation_length)
+                
+                # Read conversation history from n8n format
+                raw_messages = await self.redis.lrange(n8n_key, 0, -1)
+                conversation_history = []
+                
+                for raw_msg in raw_messages:
+                    try:
+                        msg_data = json.loads(raw_msg)
+                        # Convert to ConversationMessage format
+                        conversation_history.append(ConversationMessage(
+                            role=msg_data.get('role', 'user'),
+                            content=msg_data.get('content', ''),
+                            timestamp=datetime.fromisoformat(msg_data['timestamp']) if 'timestamp' in msg_data else datetime.utcnow()
+                        ))
+                    except Exception as e:
+                        logger.warning("message_parse_error", error=str(e), raw=raw_msg)
+                
+                # Create a new session with n8n's conversation history
+                # Note: We don't have request_values from n8n, so we'll need them from the request
+                return None  # Caller will create new session with request_values
             
-            # Reconstruct Session object
-            session = Session(**session_data)
-            
-            logger.info("session_retrieved", 
-                       session_id=session_id,
-                       messages=len(session.conversation_history))
-            
-            return session
+            logger.warning("session_not_found", session_id=session_id)
+            return None
             
         except json.JSONDecodeError as e:
             logger.error("session_decode_error", 
@@ -145,9 +176,32 @@ class SessionManager:
             data = json.dumps(session_dict)
             await self.redis.setex(key, self.ttl, data)
             
+            # Also store conversation history as a list for n8n chat memory node
+            # Using just the session_id as the key (no prefix)
+            n8n_key = session.session_id
+            
+            # Delete existing list to ensure clean state
+            await self.redis.delete(n8n_key)
+            
+            # Store each message in the conversation history
+            for msg in session.conversation_history:
+                # Format message for n8n (might need to adjust based on n8n's expected format)
+                n8n_message = {
+                    "role": msg.role,
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat() if hasattr(msg, 'timestamp') else datetime.utcnow().isoformat()
+                }
+                # Add to Redis list
+                await self.redis.rpush(n8n_key, json.dumps(n8n_message))
+            
+            # Set TTL on the n8n list
+            if session.conversation_history:
+                await self.redis.expire(n8n_key, self.ttl)
+            
             logger.info("session_saved",
                        session_id=session.session_id,
-                       ttl=self.ttl)
+                       ttl=self.ttl,
+                       n8n_messages=len(session.conversation_history))
             
             return True
             

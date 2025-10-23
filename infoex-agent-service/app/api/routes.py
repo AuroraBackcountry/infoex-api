@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Dict, Any, List
 import structlog
+import json
 
 from app.models import (
     ProcessReportRequest,
@@ -11,7 +12,8 @@ from app.models import (
     SubmissionResponse,
     SessionStatus,
     ErrorResponse,
-    HealthCheckResponse
+    HealthCheckResponse,
+    ConversationMessage
 )
 from app.services.session import session_manager
 from app.services.payload import payload_builder
@@ -37,10 +39,31 @@ async def process_report(request: ProcessReportRequest):
         session = await session_manager.get_session(request.session_id)
         
         if not session:
+            # Check if n8n has existing conversation history
+            n8n_messages = await session_manager.redis.lrange(request.session_id, 0, -1)
+            
             # Create new session with request values
             session = await session_manager.create_session(request.request_values)
             # Update session ID to match request
             session.session_id = request.session_id
+            
+            # If n8n has conversation history, import it
+            if n8n_messages:
+                logger.info("importing_n8n_conversation", 
+                           session_id=request.session_id,
+                           message_count=len(n8n_messages))
+                
+                for raw_msg in n8n_messages:
+                    try:
+                        msg_data = json.loads(raw_msg)
+                        session.conversation_history.append(ConversationMessage(
+                            role=msg_data.get('role', 'user'),
+                            content=msg_data.get('content', ''),
+                            timestamp=datetime.fromisoformat(msg_data['timestamp']) if 'timestamp' in msg_data else datetime.utcnow()
+                        ))
+                    except Exception as e:
+                        logger.warning("n8n_message_parse_error", error=str(e))
+            
             await session_manager.save_session(session)
         
         # Process message with Claude
