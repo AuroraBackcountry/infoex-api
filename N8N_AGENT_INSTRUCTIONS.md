@@ -434,7 +434,7 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 - **Body (Expression)**: 
 ```javascript
 {
-  "session_id": "{{ $workflow.id }}-{{ $execution.id }}",
+  "session_id": "{{ $json.sessionId }}",  // Your existing session ID
   "message": "{{ $json.formatted_message }}",
   "request_values": {
     "operation_id": "{{ $vars.INFOEX_OPERATION_ID }}",
@@ -449,7 +449,7 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 
 ### Key Points:
 1. The `message` field should contain your formatted observation data (using the formats above)
-2. `session_id` should be unique per conversation
+2. `session_id` should be your existing conversation session ID
 3. `request_values` must include all four required fields
 4. `location_uuids` must be an array (even if just one location)
 5. Date must be in MM/DD/YYYY format
@@ -466,7 +466,7 @@ In the future, your web app will have a toggle to control this per submission.
 ### Example Complete Request:
 ```json
 {
-  "session_id": "workflow-123-execution-456",
+  "session_id": "c74d60b2b7b345778cfd5f3a4999d7f7",
   "message": "Submit avalanche observation:\nTime: 11:30\nNumber: 1\nSize: 2\nType: Storm Slab\nTrigger: Natural\nAspect: N\nElevation: 2100",
   "request_values": {
     "operation_id": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
