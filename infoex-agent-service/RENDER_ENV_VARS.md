@@ -49,11 +49,13 @@ REDIS_URL=redis://username:password@your-redis-host.com:6379/0
 Note: Do NOT add Render's Redis addon - use your existing Redis instance
 
 ### 7. **Redis Session Prefix** (Optional)
-If n8n uses different key format:
+Only set this if n8n uses a prefix before session IDs:
 ```
 REDIS_SESSION_PREFIX=session
 ```
-(Default is "infoex:session")
+- If n8n uses just "abc-123", don't set this variable
+- If n8n uses "session:abc-123", set to "session"
+- Default is no prefix (direct session ID)
 
 ## Optional Environment Variables
 

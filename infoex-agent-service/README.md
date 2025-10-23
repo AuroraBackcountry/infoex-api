@@ -237,6 +237,7 @@ Configure your n8n HTTP Request node as follows:
 | `REDIS_HOST` | Redis server host (if not using URL) | localhost |
 | `REDIS_PORT` | Redis server port (if not using URL) | 6379 |
 | `REDIS_PASSWORD` | Redis password (if set) | None |
+| `REDIS_SESSION_PREFIX` | Optional prefix for Redis session keys | None (no prefix) |
 | `SESSION_TTL_SECONDS` | Session timeout in seconds | 3600 |
 | `CLAUDE_MODEL` | Claude model to use | claude-3-opus-20240229 |
 | `LOG_LEVEL` | Logging level | INFO |
