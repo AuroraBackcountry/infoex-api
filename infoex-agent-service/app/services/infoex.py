@@ -61,7 +61,8 @@ class InfoExClient:
         logger.info("submitting_to_infoex",
                    observation_type=observation_type,
                    endpoint=endpoint,
-                   fields=list(clean_payload.keys()))
+                   fields=list(clean_payload.keys()),
+                   payload=clean_payload)
         
         async with httpx.AsyncClient() as client:
             try:
@@ -74,16 +75,31 @@ class InfoExClient:
                 
                 if response.status_code == 200:
                     result = response.json()
-                    logger.info("submission_successful",
-                              observation_type=observation_type,
-                              uuid=result.get("uuid"))
                     
-                    return True, {
-                        "status": "success",
-                        "uuid": result.get("uuid"),
-                        "observation_type": observation_type,
-                        "submitted_at": datetime.utcnow().isoformat()
-                    }
+                    # Check if response contains a UUID (successful submission)
+                    if result.get("uuid"):
+                        logger.info("submission_successful",
+                                  observation_type=observation_type,
+                                  uuid=result.get("uuid"))
+                        
+                        return True, {
+                            "status": "success",
+                            "uuid": result.get("uuid"),
+                            "observation_type": observation_type,
+                            "submitted_at": datetime.utcnow().isoformat()
+                        }
+                    else:
+                        # 200 response but no UUID - likely an error
+                        logger.error("submission_failed_no_uuid",
+                                   observation_type=observation_type,
+                                   response=result)
+                        
+                        return False, {
+                            "status": "error",
+                            "error": "Submission returned no UUID",
+                            "response": result,
+                            "observation_type": observation_type
+                        }
                 
                 else:
                     error_data = {

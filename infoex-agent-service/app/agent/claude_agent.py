@@ -262,11 +262,35 @@ class ClaudeAgent:
             if json_match:
                 try:
                     json_data = json.loads(json_match.group(1))
-                    # Return the entire JSON payload as extracted data
+                    
+                    # Field mapping corrections for common mistakes
+                    field_mappings = {
+                        "observationDateTime": "obDate",
+                        "observationDate": "obDate",
+                        "date": "obDate",
+                        "avalanches_observed": "avalanchesObserved",
+                        "percent_area_observed": "percentAreaObserved",
+                        "operation_id": "operationUUID",
+                        "location_uuids": "locationUUIDs"
+                    }
+                    
+                    # Apply field mappings
+                    corrected_data = {}
+                    for key, value in json_data.items():
+                        # Check if this field needs to be renamed
+                        correct_key = field_mappings.get(key, key)
+                        corrected_data[correct_key] = value
+                    
+                    # Special handling for avalanchesObserved boolean to enum
+                    if obs_type == "avalanche_summary" and "avalanchesObserved" in corrected_data:
+                        val = corrected_data["avalanchesObserved"]
+                        if isinstance(val, bool) or str(val).lower() in ["yes", "true"]:
+                            corrected_data["avalanchesObserved"] = "New avalanches" if val else "No new avalanches"
+                    
                     logger.info("extracted_json_from_claude", 
                                observation_type=obs_type,
-                               fields=list(json_data.keys()))
-                    return json_data
+                               fields=list(corrected_data.keys()))
+                    return corrected_data
                 except json.JSONDecodeError:
                     logger.warning("failed_to_parse_claude_json", observation_type=obs_type)
         
