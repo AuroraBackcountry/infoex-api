@@ -427,25 +427,39 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 ### HTTP Request Node Settings:
 - **Method**: POST
 - **URL**: `https://infoex-api.onrender.com/api/process-report`
-- **Authentication**: None required
-- **Headers**: 
-  - Content-Type: `application/json`
+- **Authentication**: None
+- **Send Body**: ON
 - **Body Content Type**: JSON
-- **Body (Expression)**: 
-```javascript
-{
-  "session_id": "{{ $json.sessionId }}",  // Your existing session ID
-  "message": "{{ $json.formatted_message }}",
-  "request_values": {
-    "operation_id": "{{ $vars.INFOEX_OPERATION_ID }}",
-    "location_uuids": {{ JSON.stringify($json.location_uuids) }},
-    "zone_name": "{{ $json.zone_name }}",
-    "date": "{{ $now.format('MM/dd/yyyy') }}"
-  },
-  "auto_submit": false,  // false = IN_REVIEW (draft), true = SUBMITTED (final)
-  "conversation_context": "{{ $json.user_context_summary }}"  // Optional
-}
-```
+- **Specify Body**: Using Fields Below
+
+### Body Parameters (Add these as individual fields):
+
+**Required Fields:**
+
+| Name | Value | Type | Description |
+|------|-------|------|-------------|
+| `session_id` | `{{ $json.sessionId }}` | Expression | Your conversation session ID |
+| `message` | `{{ $json.formatted_message }}` | Expression | The formatted observation data |
+| `auto_submit` | `false` | Fixed | Set to `false` for IN_REVIEW (draft), `true` for SUBMITTED (final) |
+| `request_values.operation_id` | `{{ $vars.INFOEX_OPERATION_ID }}` | Expression | Your InfoEx operation UUID |
+| `request_values.location_uuids[0]` | `{{ $json.location_uuids[0] }}` | Expression | First location UUID |
+| `request_values.zone_name` | `{{ $json.zone_name }}` | Expression | Zone/area name |
+| `request_values.date` | `{{ $now.format('MM/dd/yyyy') }}` | Expression | Observation date |
+
+**Optional Fields:**
+
+| Name | Value | Type | Description |
+|------|-------|------|-------------|
+| `conversation_context` | `{{ $json.user_context_summary }}` | Expression | Summary of user context |
+| `submission_state` | `IN_REVIEW` | Fixed | Override submission state (IN_REVIEW or SUBMITTED) |
+
+**Notes for n8n Configuration:**
+- For arrays like `location_uuids`, you need to add each element separately:
+  - `request_values.location_uuids[0]` for the first location
+  - `request_values.location_uuids[1]` for the second location (if multiple)
+- Set the field type to "Expression" for dynamic values (using `{{ }}`)
+- Set the field type to "Fixed" for static values like `auto_submit`
+- The dot notation (e.g., `request_values.operation_id`) creates nested JSON objects
 
 ### Key Points:
 1. The `message` field should contain your formatted observation data (using the formats above)
