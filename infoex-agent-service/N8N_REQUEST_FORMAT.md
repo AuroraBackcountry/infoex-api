@@ -12,9 +12,7 @@ This is the exact format n8n should send to the Claude microservice:
     "operation_id": "your-aurora-operation-uuid",
     "location_uuids": ["location-uuid-1", "location-uuid-2"],
     "zone_name": "Your Zone Name",
-    "date": "MM/DD/YYYY",
-    "user_name": "Guide Name",
-    "user_id": "guide-user-uuid"
+    "date": "MM/DD/YYYY"
   }
 }
 ```
@@ -30,8 +28,6 @@ This is the exact format n8n should send to the Claude microservice:
 | → `location_uuids` | array | Yes | Array of location UUIDs |
 | → `zone_name` | string | Yes | Zone name (e.g., "Your Zone Name") |
 | → `date` | string | Yes | Report date in MM/DD/YYYY format |
-| → `user_name` | string | No | Name of the user submitting |
-| → `user_id` | string | No | UUID of the user |
 
 ## Example n8n HTTP Request Node Configuration
 
@@ -68,9 +64,8 @@ This is the exact format n8n should send to the Claude microservice:
 ## Notes
 
 1. **Session ID**: This should match what's in your Redis database
-2. **User Info**: Claude will include the user name in submissions
-3. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
-4. **Date Format**: Must be MM/DD/YYYY
+2. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
+3. **Date Format**: Must be MM/DD/YYYY
 
 ## Single-Step Process (Default)
 
@@ -86,9 +81,7 @@ With `auto_submit: true` (default), the service validates AND submits in one cal
     "operation_id": "your-aurora-operation-uuid",
     "location_uuids": ["location-uuid-1"],
     "zone_name": "Your Zone Name",
-    "date": "MM/DD/YYYY",
-    "user_name": "Guide Name",
-    "user_id": "guide-user-uuid"
+    "date": "MM/DD/YYYY"
   }
 }
 ```

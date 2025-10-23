@@ -31,8 +31,7 @@ def test_conversation():
         "operation_id": os.getenv("TEST_OPERATION_ID", "test-operation-uuid"),
         "location_uuids": [os.getenv("TEST_LOCATION_UUID", "test-location-uuid")],
         "zone_name": os.getenv("TEST_ZONE_NAME", "Test Zone"),
-        "date": datetime.now().strftime("%m/%d/%Y"),
-        "guide_names": ["Test Guide"]
+        "date": datetime.now().strftime("%m/%d/%Y")
     }
     
     print(f"\n💬 Starting conversation (session: {session_id})...")

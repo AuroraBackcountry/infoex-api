@@ -12,8 +12,6 @@ class RequestValues(BaseModel):
     location_uuids: List[str] = Field(..., description="List of location UUIDs")
     zone_name: str = Field(..., description="Zone name for context")
     date: str = Field(..., description="Report date in MM/DD/YYYY format")
-    user_name: Optional[str] = Field(default=None, description="Name of the user submitting")
-    user_id: Optional[str] = Field(default=None, description="UUID of the user")
     
     @validator("date")
     def validate_date_format(cls, v):

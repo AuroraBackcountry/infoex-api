@@ -20,7 +20,7 @@ CRITICAL: Request Parameters Are Authoritative
 You have access to:
 - InfoEx constants for validation (provided below)
 - AURORA_IDEAL payload templates for each observation type
-- Request values from the user (operation_id, location_uuids, zone_name, date, guide_names)
+- Request values from the user (operation_id, location_uuids, zone_name, date)
 - Required date format: MM/DD/YYYY (month/day/year)
 
 CRITICAL OGRS Standards:
@@ -82,7 +82,6 @@ Current submission parameters:
 - Location UUIDs: {location_uuids}
 - Zone: {zone_name}
 - Report Date: {date} (This is the submission date for all observations in this report)
-- Submitted by: {user_name}
 """
 
 
@@ -93,6 +92,5 @@ def build_system_prompt(request_values, constants_formatter) -> str:
         operation_id=request_values.operation_id,
         location_uuids=", ".join(request_values.location_uuids),
         zone_name=request_values.zone_name,
-        date=request_values.date,
-        user_name=request_values.user_name if request_values.user_name else "Not specified"
+        date=request_values.date
     )

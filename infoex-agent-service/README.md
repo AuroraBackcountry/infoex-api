@@ -88,9 +88,7 @@ Process a conversational message to build InfoEx payloads.
         "operation_id": "your-operation-uuid-here",
         "location_uuids": ["location-uuid-1", "location-uuid-2"],
         "zone_name": "Your Zone Name",
-        "date": "MM/DD/YYYY",
-        "user_name": "Guide Name",
-        "user_id": "guide-user-uuid"
+        "date": "MM/DD/YYYY"
     }
 }
 ```
@@ -205,9 +203,7 @@ Configure your n8n HTTP Request node as follows:
           "operation_id": "{{ $env.INFOEX_OPERATION_ID }}",
           "location_uuids": "={{ $json.location_uuids }}",
           "zone_name": "={{ $json.zone_name }}",
-          "date": "={{ $now.format('MM/dd/yyyy') }}",
-          "user_name": "={{ $json.user_name }}",
-          "user_id": "={{ $json.user_id }}"
+          "date": "={{ $now.format('MM/dd/yyyy') }}"
         }
       }
     ]

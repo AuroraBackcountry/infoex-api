@@ -28,9 +28,7 @@
       "operation_id": "your-operation-uuid-here",
       "location_uuids": ["location-uuid-1", "location-uuid-2"],
       "zone_name": "Your Zone Name",
-      "date": "MM/DD/YYYY",
-      "user_name": "Guide Name",
-      "user_id": "guide-user-uuid"
+      "date": "MM/DD/YYYY"
     }
   }
   ```
