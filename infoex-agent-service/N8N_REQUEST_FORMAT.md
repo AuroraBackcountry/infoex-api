@@ -72,44 +72,50 @@ This is the exact format n8n should send to the Claude microservice:
 3. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
 4. **Date Format**: Must be MM/DD/YYYY (e.g., "10/22/2025")
 
-## Two-Step Process
+## Single-Step Process (Default)
 
-### Step 1: Process Report Response
-Claude validates and responds:
-```json
-{
-  "response": "Payload validated and ready for avalanche observation submission"
-}
-```
+With `auto_submit: true` (default), the service validates AND submits in one call:
 
-### Step 2: Submit to InfoEx
-After Claude validates, call the submission endpoint:
+### Request:
 ```json
-POST /api/submit-to-infoex
 {
   "session_id": "28f2849a-d476-4186-a41e-cf116db481c8",
-  "submission_types": ["avalanche_observation"]
+  "message": "Submit avalanche observation - size 3 at north aspect",
+  "auto_submit": true,  // Optional, defaults to true
+  "fixed_values": {
+    "operation_id": "your-aurora-operation-uuid",
+    "location_uuids": ["location-uuid-1"],
+    "zone_name": "Whistler Blackcomb",
+    "date": "10/22/2025",
+    "user_name": "Ben Johns",
+    "user_id": "93576f96-fe5f-4e97-91e4-bd22560da051"
+  }
 }
 ```
 
-### Submission Response
+### Response (with auto-submission):
 ```json
 {
-  "success": true,
-  "message": "Processed 1 submissions. All successful! Details: avalanche_observation: Submitted (UUID: 123e4567)",
-  "submissions": [
-    {
-      "observation_type": "avalanche_observation",
-      "success": true,
-      "result": {"uuid": "123e4567-e89b-12d3-a456-426614174000"}
-    }
-  ]
+  "response": "Payload validated and ready for avalanche observation submission\n\nAuto-submission results:\navalanche_observation: Submitted (UUID: 123e4567-e89b-12d3-a456)"
 }
 ```
 
-## n8n Workflow
+## Validation-Only Mode
 
-1. **HTTP Request 1**: Call `/api/process-report` with message
-2. **If Node**: Check if response contains "ready for submission"
-3. **HTTP Request 2**: If ready, call `/api/submit-to-infoex`
-4. **Set Node**: Extract UUID from submission response
+To validate without submitting, set `auto_submit: false`:
+
+```json
+{
+  "session_id": "test-123",
+  "message": "Check this avalanche observation...",
+  "auto_submit": false,
+  "fixed_values": {...}
+}
+```
+
+## n8n Workflow (Simplified!)
+
+Just ONE HTTP Request node:
+1. **HTTP Request**: Call `/api/process-report` with message
+2. **Parse Response**: Extract UUID from submission results
+3. **Done!**

@@ -42,11 +42,12 @@ class ProcessReportRequest(BaseModel):
     session_id: str = Field(..., description="Unique session identifier")
     message: str = Field(..., description="User message to process")
     fixed_values: FixedValues = Field(..., description="Fixed values from n8n")
+    auto_submit: bool = Field(default=True, description="Automatically submit to InfoEx when ready")
 
 
 class ProcessReportResponse(BaseModel):
     """Response model for processed report - plain text"""
-    response: str = Field(..., description="Claude's plain text response")
+    response: str = Field(..., description="Claude's plain text response, includes submission results if auto_submit=true")
 
 
 class SubmissionRequest(BaseModel):

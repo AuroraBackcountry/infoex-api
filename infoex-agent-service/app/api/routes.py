@@ -52,10 +52,44 @@ async def process_report(request: ProcessReportRequest):
         # Save updated session
         await session_manager.save_session(updated_session)
         
+        # Check if auto-submit is enabled and payloads are ready
+        if request.auto_submit and "ready for" in response_text.lower() and "submission" in response_text.lower():
+            # Find which payloads are ready
+            ready_types = []
+            for obs_type, payload in updated_session.payloads.items():
+                if payload.status == "ready":
+                    ready_types.append(obs_type)
+            
+            if ready_types:
+                # Auto-submit ready payloads
+                submission_results = []
+                for obs_type in ready_types:
+                    # Build payload
+                    payload_data, errors = payload_builder.build_payload(obs_type, updated_session)
+                    
+                    if not errors:
+                        # Submit to InfoEx
+                        success, result = await infoex_client.submit_observation(obs_type, payload_data)
+                        
+                        if success:
+                            submission_results.append(f"{obs_type}: Submitted (UUID: {result.get('uuid')})")
+                            updated_session.payloads[obs_type].status = "submitted"
+                        else:
+                            submission_results.append(f"{obs_type}: Failed - {result.get('error', 'Unknown error')}")
+                    else:
+                        submission_results.append(f"{obs_type}: Validation errors - {', '.join(errors)}")
+                
+                # Save updated session with submission status
+                await session_manager.save_session(updated_session)
+                
+                # Append submission results to response
+                response_text += f"\n\nAuto-submission results:\n" + "\n".join(submission_results)
+        
         logger.info("report_processed",
                    session_id=request.session_id,
                    message_length=len(request.message),
-                   response_length=len(response_text))
+                   response_length=len(response_text),
+                   auto_submit=request.auto_submit)
         
         return ProcessReportResponse(response=response_text)
         
