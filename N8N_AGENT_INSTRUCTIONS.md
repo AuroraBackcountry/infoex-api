@@ -151,23 +151,32 @@ Comments: [operational summary text]
 Submit avalanche observation:
 Time: [HH:MM]
 Number: [count, default 1]
-Size: [1-5, decimals allowed]
-Type: [Storm Slab|Wind Slab|Persistent Slab|Deep Persistent|Wet Slab|Wet Loose|Loose Dry|Cornice]
+Size: [1-5, decimals allowed like 2.5]
+Type: [Storm Slab|Wind Slab|Persistent Slab|Deep Persistent Slab|Wet Slab|Wet Loose|Loose Dry|Cornice|Glide]
 Trigger: [Natural|Skier accidental|Skier intentional|Snowmobile|Explosive|Unknown]
-Aspect: [N|NE|E|SE|S|SW|W|NW] (can be multiple)
+Aspect: [N|NE|E|SE|S|SW|W|NW] (can be multiple, e.g., "N,NE")
 Elevation: [meters]
 Width: [meters, optional]
 Depth: [cm, optional]
 Comments: [additional details, optional]
 ```
 
+**Note**: Claude will convert these to proper InfoEx codes:
+- Trigger: "Natural" → "Na", "Skier accidental" → "Sa"
+- Type: "Storm Slab" → "STORM_SLAB"
+
 ### Avalanche Summary Format:
 ```
 Submit avalanche summary:
-Avalanches observed: [Yes|No]
+Avalanches observed: [Yes|No|Minor sluffing only]
 Percent area observed: [0-100]
 Comments: [description of avalanche activity]
 ```
+
+**Note**: Claude will convert to InfoEx values:
+- "Yes" → "New avalanches"
+- "No" → "No new avalanches"  
+- "Minor sluffing only" → "Sluffing/Pinwheeling only"
 
 ### Hazard Assessment Format:
 ```
@@ -235,6 +244,32 @@ Would you like me to submit this?
 - Only ask for truly missing REQUIRED fields
 - If they say "just use the comment", respect that
 
+## Important: Natural Language to InfoEx Mapping
+
+The n8n agent uses natural language that users understand, while Claude converts to exact InfoEx codes:
+
+**Triggers:**
+- "Natural" → "Na"
+- "Skier accidental" → "Sa"
+- "Skier intentional" → "Ss"
+
+**Avalanche Types:**
+- "Storm Slab" → "STORM_SLAB"
+- "Wind Slab" → "WIND_SLAB"
+- "Persistent Slab" → "PERSISTENT_SLAB"
+
+**Avalanche Activity:**
+- "Yes" (new avalanches) → "New avalanches"
+- "No" (no new avalanches) → "No new avalanches"
+- "Minor sluffing only" → "Sluffing/Pinwheeling only"
+
+**Hazard Ratings:**
+- 1 or "Low" → Rating: 1
+- 2 or "Moderate" → Rating: 2
+- 3 or "Considerable" → Rating: 3
+- 4 or "High" → Rating: 4
+- 5 or "Extreme" → Rating: 5
+
 ## Example: Streamlined Interaction
 
 **User**: "I'd like to make an avalanche summary. We saw multiple loose wet avalanches on steep solar aspects below 2000m. Observed about 10% of terrain."
@@ -257,6 +292,22 @@ Would you like me to submit this now?
 - "Can you confirm the date?"
 
 Trust the user's description - they're avalanche professionals!
+
+### 4. Show JSON Payload When Requested
+If user asks "show me the payload", display the full JSON that will be sent:
+```json
+{
+  "session_id": "unique-id",
+  "message": "Submit avalanche summary:\nAvalanches observed: Yes\nPercent area observed: 10\nComments: Multiple loose wet avalanches...",
+  "request_values": {
+    "operation_id": "your-operation-uuid",
+    "location_uuids": ["location-uuid"],
+    "zone_name": "Your Zone",
+    "date": "10/23/2025"
+  },
+  "auto_submit": true
+}
+```
 
 ## Full Report Processing
 
