@@ -177,7 +177,8 @@ class ClaudeAgent:
                 extracted_data = self._extract_data_for_type(
                     obs_type, 
                     user_message,
-                    session.conversation_history
+                    session.conversation_history,
+                    claude_response
                 )
                 
                 # Merge extracted data
@@ -190,6 +191,13 @@ class ClaudeAgent:
                 
                 payload.missing_fields = list(missing)
                 payload.status = "ready" if not missing else "incomplete"
+                
+                logger.info("payload_status_updated",
+                           observation_type=obs_type,
+                           status=payload.status,
+                           required_fields=list(required),
+                           present_fields=list(present),
+                           missing_fields=list(missing))
         
         return session
     
@@ -223,22 +231,35 @@ class ClaudeAgent:
         self,
         obs_type: str,
         current_message: str,
-        conversation_history: List[ConversationMessage]
+        conversation_history: List[ConversationMessage],
+        claude_response: str = None
     ) -> Dict[str, Any]:
         """Extract relevant data for observation type from conversation"""
         
-        # This is a placeholder for more sophisticated extraction
-        # In production, you might use:
-        # 1. Regular expressions for structured data
-        # 2. Claude itself to extract structured data
-        # 3. NLP libraries for entity extraction
+        import re
+        import json
         
+        # First, check if Claude generated a JSON payload in the response
+        if claude_response:
+            # Look for JSON block in Claude's response
+            json_match = re.search(r'```json\s*\n(.*?)\n```', claude_response, re.DOTALL)
+            if json_match:
+                try:
+                    json_data = json.loads(json_match.group(1))
+                    # Return the entire JSON payload as extracted data
+                    logger.info("extracted_json_from_claude", 
+                               observation_type=obs_type,
+                               fields=list(json_data.keys()))
+                    return json_data
+                except json.JSONDecodeError:
+                    logger.warning("failed_to_parse_claude_json", observation_type=obs_type)
+        
+        # Fallback to basic extraction
         extracted = {}
         
         # Example extractions for specific types
         if obs_type == "avalanche_observation":
             # Look for size mentions
-            import re
             size_match = re.search(r'size\s*(\d+(?:\.\d+)?)', current_message.lower())
             if size_match:
                 extracted["sizeMin"] = float(size_match.group(1))

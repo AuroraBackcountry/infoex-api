@@ -54,6 +54,12 @@ async def process_report(request: ProcessReportRequest):
         
         # Check if auto-submit is enabled and payloads are ready
         if request.auto_submit and "ready for" in response_text.lower() and "submission" in response_text.lower():
+            # Log payload states for debugging
+            logger.info("checking_payloads_for_submission",
+                       session_id=request.session_id,
+                       payloads_count=len(updated_session.payloads),
+                       payload_states={k: v.status for k, v in updated_session.payloads.items()})
+            
             # Find which payloads are ready
             ready_types = []
             for obs_type, payload in updated_session.payloads.items():
@@ -61,6 +67,10 @@ async def process_report(request: ProcessReportRequest):
                     ready_types.append(obs_type)
             
             if ready_types:
+                logger.info("submitting_ready_payloads",
+                           session_id=request.session_id,
+                           ready_types=ready_types)
+                
                 # Auto-submit ready payloads
                 submission_results = []
                 for obs_type in ready_types:
@@ -84,6 +94,11 @@ async def process_report(request: ProcessReportRequest):
                 
                 # Append submission results to response
                 response_text += f"\n\nAuto-submission results:\n" + "\n".join(submission_results)
+            else:
+                logger.warning("no_ready_payloads_despite_response",
+                              session_id=request.session_id,
+                              response_contains_ready=("ready for" in response_text.lower()),
+                              payloads_count=len(updated_session.payloads))
         
         logger.info("report_processed",
                    session_id=request.session_id,
