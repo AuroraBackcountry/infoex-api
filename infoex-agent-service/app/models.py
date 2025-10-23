@@ -45,6 +45,10 @@ class ProcessReportRequest(BaseModel):
         default=None, 
         description="Override submission state: IN_REVIEW or SUBMITTED (uses env default if not provided)"
     )
+    conversation_context: Optional[str] = Field(
+        default=None,
+        description="Optional context from n8n conversation (can be JSON string, plain text summary, etc.)"
+    )
 
 
 class ProcessReportResponse(BaseModel):

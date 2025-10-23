@@ -41,6 +41,11 @@ async def process_report(request: ProcessReportRequest):
             session = await session_manager.create_session(request.request_values)
             # Update session ID to match request
             session.session_id = request.session_id
+            
+            # If conversation context provided, add it as metadata
+            if request.conversation_context:
+                session.metadata["n8n_context"] = request.conversation_context
+            
             await session_manager.save_session(session)
         
         # Process message with Claude

@@ -89,7 +89,8 @@ Process a conversational message to build InfoEx payloads.
         "location_uuids": ["location-uuid-1", "location-uuid-2"],
         "zone_name": "Your Zone Name",
         "date": "MM/DD/YYYY"
-    }
+    },
+    "conversation_context": "Optional: Context from n8n user conversation"
 }
 ```
 

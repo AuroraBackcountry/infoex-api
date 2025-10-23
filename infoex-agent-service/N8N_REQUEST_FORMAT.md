@@ -1,5 +1,37 @@
 # Expected Request Body from n8n
 
+## Important: Chat History Architecture
+
+The system maintains **two separate chat histories**:
+
+1. **N8N ↔ User Chat History** - Managed entirely by n8n
+   - Stored in n8n's format (e.g., as a list)
+   - Contains the full user conversation
+   - Not directly read by the Claude service
+
+2. **N8N Agent ↔ Claude Agent Chat History** - Managed by this service
+   - Stored with structured format (role/content pairs)
+   - Contains only agent-to-agent communication
+   - Used for maintaining context between API calls
+
+### Optional Context Passing
+
+If n8n wants to provide context from the user conversation, it can use the optional `conversation_context` field:
+
+```json
+{
+  "session_id": "unique-session-id",
+  "message": "Submit this report",
+  "request_values": {...},
+  "conversation_context": "User mentioned size 3 avalanche on north aspect at 2100m"
+}
+```
+
+This context can be:
+- A plain text summary
+- A JSON string
+- Any format that helps provide context
+
 ## POST /api/process-report
 
 This is the exact format n8n should send to the Claude microservice:
@@ -28,6 +60,7 @@ This is the exact format n8n should send to the Claude microservice:
 | → `location_uuids` | array | Yes | Array of location UUIDs |
 | → `zone_name` | string | Yes | Zone name (e.g., "Your Zone Name") |
 | → `date` | string | Yes | Report date in MM/DD/YYYY format |
+| `conversation_context` | string | No | Optional context from n8n user conversation |
 
 ## Example n8n HTTP Request Node Configuration
 

@@ -97,6 +97,22 @@ class ClaudeAgent:
         """Build message history for Claude"""
         messages = []
         
+        # If there's n8n context and this is the first message, include it
+        if session.metadata.get("n8n_context") and len(session.conversation_history) == 1:
+            context_msg = (
+                "Context from n8n conversation:\n"
+                f"{session.metadata['n8n_context']}\n\n"
+                "Based on this context, process the following request:"
+            )
+            messages.append({
+                "role": "user",
+                "content": context_msg
+            })
+            messages.append({
+                "role": "assistant", 
+                "content": "I understand the context. I'll process your request based on this information."
+            })
+        
         # Include conversation history (limited to avoid token limits)
         history_limit = settings.max_conversation_length
         relevant_history = session.conversation_history[-history_limit:]
