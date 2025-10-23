@@ -328,7 +328,7 @@ If user asks "show me the payload", display the full JSON that will be sent:
     "zone_name": "Your Zone",
     "date": "10/23/2025"
   },
-  "auto_submit": true,
+  "auto_submit": false,  // false = IN_REVIEW (draft), true = SUBMITTED (final)
   "submission_state": "IN_REVIEW"  // Optional: Override draft/final state
 }
 ```
@@ -397,7 +397,7 @@ When sending data to the Claude agent service, configure your HTTP Request node 
     "zone_name": "{{ $json.zone_name }}",
     "date": "{{ $now.format('MM/dd/yyyy') }}"
   },
-  "auto_submit": true,
+  "auto_submit": false,  // false = IN_REVIEW (draft), true = SUBMITTED (final)
   "conversation_context": "{{ $json.user_context_summary }}"  // Optional
 }
 ```
@@ -429,6 +429,6 @@ In the future, your web app will have a toggle to control this per submission.
     "zone_name": "North Bowl",
     "date": "10/23/2025"
   },
-  "auto_submit": true
+  "auto_submit": false  // false = IN_REVIEW (draft), true = SUBMITTED (final)
 }
 ```

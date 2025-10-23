@@ -102,16 +102,19 @@ This is the exact format n8n should send to the Claude microservice:
 2. **No Redis Lookup Needed**: By passing all data in the request, Claude doesn't need to guess Redis structure
 3. **Date Format**: Must be MM/DD/YYYY
 
-## Single-Step Process (Default)
+## Auto-Submission Behavior
 
-With `auto_submit: true` (default), the service validates AND submits in one call:
+The service ALWAYS auto-submits to InfoEx when Claude indicates the payload is ready.
+The `auto_submit` flag controls the submission state:
+- `auto_submit: false` = Submit as IN_REVIEW (draft)
+- `auto_submit: true` = Submit as SUBMITTED (final)
 
 ### Request:
 ```json
 {
   "session_id": "your-session-id-here",
   "message": "Submit avalanche observation - size 3 at north aspect",
-  "auto_submit": true,  // Optional, defaults to true
+  "auto_submit": true,  // true = SUBMITTED (final), false = IN_REVIEW (draft)
   "request_values": {
     "operation_id": "your-aurora-operation-uuid",
     "location_uuids": ["location-uuid-1"],
@@ -124,19 +127,19 @@ With `auto_submit: true` (default), the service validates AND submits in one cal
 ### Response (with auto-submission):
 ```json
 {
-  "response": "Payload validated and ready for avalanche observation submission\n\nAuto-submission results:\navalanche_observation: Submitted (UUID: 123e4567-e89b-12d3-a456)"
+  "response": "Payload validated and ready for avalanche observation submission\n\nAuto-submission results:\navalanche_observation: Successfully submitted to InfoEx\n  - UUID: 123e4567-e89b-12d3-a456\n  - State: SUBMITTED"
 }
 ```
 
-## Validation-Only Mode
+## Draft Mode (IN_REVIEW)
 
-To validate without submitting, set `auto_submit: false`:
+To submit as a draft (IN_REVIEW state), set `auto_submit: false`:
 
 ```json
 {
   "session_id": "test-123",
-  "message": "Check this avalanche observation...",
-  "auto_submit": false,
+  "message": "Submit avalanche observation as draft...",
+  "auto_submit": false,  // Submits as IN_REVIEW (draft)
   "request_values": {...}
 }
 ```
