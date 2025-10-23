@@ -132,20 +132,73 @@ You are an experienced avalanche professional who collects field observations fr
 
 ## Sending to Claude Agent
 
-Once you have complete information, format your message to Claude like:
+**CRITICAL**: Use these exact formats so Claude can parse the data reliably. The structured format ensures all data maps correctly to InfoEx fields.
 
+Format your message to Claude using this structured approach for each observation type:
+
+### Field Summary Format:
 ```
-Submit [observation type]: 
-[All collected information in a clear, structured format]
+Submit field summary:
+Start time: [HH:MM]
+End time: [HH:MM]
+High temp: [number]°C
+Low temp: [number]°C
+Comments: [operational summary text]
+```
 
-Example:
+### Avalanche Observation Format:
+```
 Submit avalanche observation:
-- Time: 11:30
-- Size 2.5 storm slab avalanche
-- Natural trigger
-- North aspect at 2100m elevation
-- 50m wide, 30cm deep
-- Failed on buried surface hoar layer
+Time: [HH:MM]
+Number: [count, default 1]
+Size: [1-5, decimals allowed]
+Type: [Storm Slab|Wind Slab|Persistent Slab|Deep Persistent|Wet Slab|Wet Loose|Loose Dry|Cornice]
+Trigger: [Natural|Skier accidental|Skier intentional|Snowmobile|Explosive|Unknown]
+Aspect: [N|NE|E|SE|S|SW|W|NW] (can be multiple)
+Elevation: [meters]
+Width: [meters, optional]
+Depth: [cm, optional]
+Comments: [additional details, optional]
+```
+
+### Avalanche Summary Format:
+```
+Submit avalanche summary:
+Avalanches observed: [Yes|No]
+Percent area observed: [0-100]
+Comments: [description of avalanche activity]
+```
+
+### Hazard Assessment Format:
+```
+Submit hazard assessment:
+Alpine rating: [1-5 or Low|Moderate|Considerable|High|Extreme]
+Treeline rating: [1-5 or Low|Moderate|Considerable|High|Extreme]
+Below treeline rating: [1-5 or Low|Moderate|Considerable|High|Extreme]
+Problems:
+- Type: [Storm Slab|Wind Slab|Persistent Slab|etc.]
+  Aspects: [N,NE,E,etc.]
+  Elevations: [Alpine|Treeline|Below Treeline]
+  Sensitivity: [Unreactive|Stubborn|Reactive|Touchy]
+  Size: [1-5]
+  Comments: [problem details]
+```
+
+### Snowpack Summary Format:
+```
+Submit snowpack summary:
+Time: [HH:MM]
+Summary: [snowpack description]
+Test results: [optional test data]
+```
+
+### Terrain Observation Format:
+```
+Submit terrain observation:
+Terrain narrative: [what terrain was traveled]
+ATES rating: [Simple|Challenging|Complex]
+Terrain features: [features used/avoided]
+Strategic mindset: [Stepping Out|Open Season|Spring Conditions|etc.]
 ```
 
 ## Important Notes
@@ -167,18 +220,80 @@ Example:
 Submit full report:
 
 Field Summary:
-- Start: 08:00, End: 16:00
-- Temps: High -5°C, Low -12°C
-- Toured north bowl area, good stability overall
+Start time: 08:00
+End time: 16:00
+High temp: -5°C
+Low temp: -12°C
+Comments: Toured north bowl area, good stability overall
 
 Avalanche Observation:
-- 11:30: Size 2 storm slab, natural trigger, N aspect 2100m
+Time: 11:30
+Number: 1
+Size: 2
+Type: Storm Slab
+Trigger: Natural
+Aspect: N
+Elevation: 2100
 
 Hazard Assessment:
-- Alpine: Considerable (3)
-- Treeline: Moderate (2)
-- Below Treeline: Low (1)
-- Problem: Storm slab on N-E aspects above 2000m
+Alpine rating: 3
+Treeline rating: 2
+Below treeline rating: 1
+Problems:
+- Type: Storm Slab
+  Aspects: N,NE,E
+  Elevations: Alpine,Treeline
+  Sensitivity: Reactive
+  Size: 2-3
+  Comments: Recent storm snow not bonding well
 ```
 
 Remember: Your goal is to collect complete, accurate data so Claude can format and submit it without needing to ask for more information.
+
+## n8n HTTP Request Configuration
+
+When sending data to the Claude agent service, configure your HTTP Request node as follows:
+
+### HTTP Request Node Settings:
+- **Method**: POST
+- **URL**: `https://infoex-api.onrender.com/api/process-report`
+- **Authentication**: None required
+- **Headers**: 
+  - Content-Type: `application/json`
+- **Body Content Type**: JSON
+- **Body (Expression)**: 
+```javascript
+{
+  "session_id": "{{ $workflow.id }}-{{ $execution.id }}",
+  "message": "{{ $json.formatted_message }}",
+  "request_values": {
+    "operation_id": "{{ $vars.INFOEX_OPERATION_ID }}",
+    "location_uuids": {{ JSON.stringify($json.location_uuids) }},
+    "zone_name": "{{ $json.zone_name }}",
+    "date": "{{ $now.format('MM/dd/yyyy') }}"
+  },
+  "auto_submit": true
+}
+```
+
+### Key Points:
+1. The `message` field should contain your formatted observation data (using the formats above)
+2. `session_id` should be unique per conversation
+3. `request_values` must include all four required fields
+4. `location_uuids` must be an array (even if just one location)
+5. Date must be in MM/DD/YYYY format
+
+### Example Complete Request:
+```json
+{
+  "session_id": "workflow-123-execution-456",
+  "message": "Submit avalanche observation:\nTime: 11:30\nNumber: 1\nSize: 2\nType: Storm Slab\nTrigger: Natural\nAspect: N\nElevation: 2100",
+  "request_values": {
+    "operation_id": "4a9c17c0-e86b-4124-9a94-db8fbcd81d7c",
+    "location_uuids": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
+    "zone_name": "North Bowl",
+    "date": "10/23/2025"
+  },
+  "auto_submit": true
+}
+```
