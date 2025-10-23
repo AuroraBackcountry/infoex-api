@@ -7,7 +7,7 @@ import re
 
 
 class FixedValues(BaseModel):
-    """Fixed values provided by n8n for each request"""
+    """Request-specific values provided by n8n for this submission"""
     operation_id: str = Field(..., description="InfoEx operation UUID")
     location_uuids: List[str] = Field(..., description="List of location UUIDs")
     zone_name: str = Field(..., description="Zone name for context")
