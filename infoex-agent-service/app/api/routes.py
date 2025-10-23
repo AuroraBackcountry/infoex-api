@@ -58,6 +58,14 @@ async def process_report(request: ProcessReportRequest):
         await session_manager.save_session(updated_session)
         
         # Check if auto-submit is enabled and payloads are ready
+        if request.auto_submit:
+            logger.info("auto_submit_check",
+                       session_id=request.session_id,
+                       auto_submit=request.auto_submit,
+                       response_contains_ready="ready for" in response_text.lower(),
+                       response_contains_submission="submission" in response_text.lower(),
+                       response_snippet=response_text.lower()[-200:] if len(response_text) > 200 else response_text.lower())
+            
         if request.auto_submit and "ready for" in response_text.lower() and "submission" in response_text.lower():
             # Log payload states for debugging
             logger.info("checking_payloads_for_submission",
@@ -107,7 +115,9 @@ async def process_report(request: ProcessReportRequest):
                 logger.warning("no_ready_payloads_despite_response",
                               session_id=request.session_id,
                               response_contains_ready=("ready for" in response_text.lower()),
-                              payloads_count=len(updated_session.payloads))
+                              payloads_count=len(updated_session.payloads),
+                              payload_details={k: {"status": v.status, "missing": v.missing_fields} 
+                                             for k, v in updated_session.payloads.items()})
         
         logger.info("report_processed",
                    session_id=request.session_id,

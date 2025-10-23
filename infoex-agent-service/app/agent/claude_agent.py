@@ -204,9 +204,15 @@ class ClaudeAgent:
         # First check if Claude is ready to submit a specific type
         submission_type = None
         if "ready for" in claude_response.lower() and "submission" in claude_response.lower():
-            for obs_type in session.payloads:
+            # Check against all possible observation types, not just initialized ones
+            possible_types = ["field_summary", "avalanche_observation", "avalanche_summary", 
+                            "hazard_assessment", "snowpack_summary", "terrain_observation"]
+            for obs_type in possible_types:
                 if f"ready for {obs_type.replace('_', ' ')} submission" in claude_response.lower():
                     submission_type = obs_type
+                    # Ensure this type is in mentioned_types so it gets initialized
+                    if obs_type not in mentioned_types:
+                        mentioned_types.append(obs_type)
                     break
         
         # Update payloads based on conversation
@@ -279,12 +285,6 @@ class ClaudeAgent:
             "snowpack_summary": ["snowpack summary", "snowpack structure", "snow layers"],
             "terrain_observation": ["terrain observation", "ates rating", "strategic mindset"]
         }
-        
-        # Check for explicit submission mentions in Claude's response
-        if "ready for" in claude_response.lower() and "submission" in claude_response.lower():
-            for obs_type in keywords:
-                if f"ready for {obs_type.replace('_', ' ')} submission" in claude_response.lower():
-                    return [obs_type]  # Return only the specific type being submitted
         
         combined_text = (user_message + " " + claude_response).lower()
         
