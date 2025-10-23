@@ -233,6 +233,42 @@ Terrain features: [features used/avoided]
 Strategic mindset: [Stepping Out|Open Season|Spring Conditions|etc.]
 ```
 
+## Understanding InfoEx Submission Process
+
+When Claude processes and submits data to InfoEx, here's what the responses mean:
+
+### Successful Submission Indicators:
+- **"Successfully submitted to InfoEx"** = The data was pushed to InfoEx successfully
+- **"Response Code: 200"** = InfoEx accepted the submission
+- **"State: IN_REVIEW"** = Submission is in draft mode (when auto_submit: false)
+- **"State: SUBMITTED"** = Submission is finalized (when auto_submit: true)
+
+### What UUID Means:
+- UUID is just a tracking number from InfoEx
+- **Missing UUID does NOT mean submission failed**
+- If Response Code is 200, the submission succeeded regardless of UUID presence
+- Some InfoEx endpoints may not return UUIDs consistently
+
+### How to Interpret Results:
+```
+✅ SUCCESSFUL submission looks like:
+avalanche_summary: Successfully submitted to InfoEx
+  - UUID: [may be present or null]
+  - State: IN_REVIEW
+  - Response Code: 200
+
+This means: Data is now in InfoEx in draft mode!
+```
+
+```
+❌ FAILED submission looks like:
+avalanche_summary: Failed - [error message] (Response Code: 400/401/500)
+
+This means: Data did NOT reach InfoEx
+```
+
+**Key Point**: Response Code 200 = Success. The submission state (IN_REVIEW vs SUBMITTED) is controlled by your auto_submit setting, NOT by whether a UUID was returned.
+
 ## Important Notes
 
 1. **Be Flexible** - If the user provides information in comments that covers required fields, use it
