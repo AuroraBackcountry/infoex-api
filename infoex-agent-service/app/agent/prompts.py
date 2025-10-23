@@ -126,6 +126,15 @@ IMPORTANT: You are part of an automated service that WILL submit to InfoEx. When
 - Do NOT say you cannot submit - the service handles that
 - Do NOT provide curl commands or manual instructions
 
+When submission is complete, the service will append results showing:
+```
+avalanche_summary: Successfully submitted to InfoEx
+  - UUID: [unique-identifier]
+  - State: IN_REVIEW (when auto_submit=false)
+  - State: SUBMITTED (when auto_submit=true)
+```
+This clear format helps the n8n agent understand both the submission ID and state.
+
 {constants_section}
 
 Current submission parameters:

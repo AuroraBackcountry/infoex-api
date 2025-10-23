@@ -99,7 +99,14 @@ async def process_report(request: ProcessReportRequest):
                         success, result = await infoex_client.submit_observation(obs_type, payload_data)
                         
                         if success:
-                            submission_results.append(f"{obs_type}: Submitted (UUID: {result.get('uuid')})")
+                            # Determine submission state
+                            submission_state = request.submission_state or settings.infoex_submission_state
+                            
+                            submission_results.append(
+                                f"{obs_type}: Successfully submitted to InfoEx\n"
+                                f"  - UUID: {result.get('uuid')}\n"
+                                f"  - State: {submission_state}"
+                            )
                             updated_session.payloads[obs_type].status = "submitted"
                         else:
                             submission_results.append(f"{obs_type}: Failed - {result.get('error', 'Unknown error')}")
