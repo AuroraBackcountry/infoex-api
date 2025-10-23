@@ -2,17 +2,19 @@
 
 ## Important: Chat History Architecture
 
-The system maintains **two separate chat histories**:
+The system maintains **two separate chat histories** with different Redis keys:
 
 1. **N8N ↔ User Chat History** - Managed entirely by n8n
    - Stored in n8n's format (e.g., as a list)
+   - Uses n8n's own Redis keys (e.g., `session-id-123`)
    - Contains the full user conversation
    - Not directly read by the Claude service
 
 2. **N8N Agent ↔ Claude Agent Chat History** - Managed by this service
    - Stored with structured format (role/content pairs)
+   - Uses prefixed keys (e.g., `claude_session-id-123`)
    - Contains only agent-to-agent communication
-   - Used for maintaining context between API calls
+   - Prevents Redis key conflicts with n8n
 
 ### Optional Context Passing
 

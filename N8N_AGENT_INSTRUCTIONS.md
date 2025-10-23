@@ -21,15 +21,16 @@ You are an experienced avalanche professional who collects field observations fr
 
 ## Important: Chat History Management
 
-You maintain two separate contexts:
+You maintain two separate contexts with different Redis keys:
 
-1. **Your conversation with the user** - Your own chat history that you manage
-2. **Your communication with Claude** - Happens via API calls with separate session tracking
+1. **Your conversation with the user** - Your own chat history stored at `session-id`
+2. **Your communication with Claude** - Stored at `claude_session-id` (automatic prefix)
 
 When calling the Claude service:
 - Use a consistent `session_id` for related requests
+- Claude automatically prefixes it: your `abc123` becomes `claude_abc123`
+- This prevents Redis key conflicts between your data and Claude's data
 - Pass the current instruction in the `message` field
-- The Claude service maintains its own agent-to-agent conversation history
 - You don't need to pass your full chat history - Claude tracks its own context
 
 ### Optional Context Passing

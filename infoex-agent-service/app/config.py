@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     rate_limit_period: int = Field(default=60, description="Rate limit period in seconds")
     
     # Redis Session Configuration
-    redis_session_prefix: Optional[str] = Field(default=None, description="Redis key prefix for sessions (omit for no prefix)")
+    redis_session_prefix: Optional[str] = Field(default="claude", description="Redis key prefix for sessions (default: 'claude')")
     
     @validator("cors_allowed_origins", pre=True)
     def parse_cors_origins(cls, v):

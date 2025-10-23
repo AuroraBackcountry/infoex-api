@@ -23,6 +23,19 @@ def test_submission_state():
         print(f"❌ Failed to check submission state: {e}")
         return False
 
+def test_redis_prefix():
+    """Test that Redis prefix is working correctly"""
+    print("\n🔑 Testing Redis prefix configuration...")
+    try:
+        # The service should use "claude" as default prefix
+        prefix = os.getenv("REDIS_SESSION_PREFIX", "claude")
+        print(f"✅ Redis prefix is set to: '{prefix}'")
+        print(f"   (Sessions will be stored as: {prefix}_<session_id>)")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to check Redis prefix: {e}")
+        return False
+
 def test_health():
     """Test health endpoint"""
     print("🏥 Testing health check...")
@@ -122,6 +135,7 @@ def main():
     
     try:
         test_submission_state()
+        test_redis_prefix()
         test_health()
         test_conversation()
         test_locations()

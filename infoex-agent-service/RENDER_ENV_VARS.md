@@ -48,14 +48,14 @@ REDIS_URL=redis://username:password@your-redis-host.com:6379/0
 ```
 Note: Do NOT add Render's Redis addon - use your existing Redis instance
 
-### 7. **Redis Session Prefix** (Optional)
-Only set this if n8n uses a prefix before session IDs:
+### 7. **Redis Session Prefix** (Default: "claude")
+This prefix prevents Redis key conflicts between n8n and Claude:
 ```
-REDIS_SESSION_PREFIX=session
+REDIS_SESSION_PREFIX=claude
 ```
-- If n8n uses just "abc-123", don't set this variable
-- If n8n uses "session:abc-123", set to "session"
-- Default is no prefix (direct session ID)
+- Default is "claude" - Claude uses keys like: `claude_abc-123`
+- This keeps Claude's data separate from n8n's keys: `abc-123`
+- Only override if you need a different prefix strategy
 
 ## Optional Environment Variables
 
