@@ -3,6 +3,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from contextlib import asynccontextmanager
 import structlog
 import logging
@@ -91,6 +92,65 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Validation error handler
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors with helpful response"""
+    logger.warning("validation_error",
+                  path=request.url.path,
+                  errors=exc.errors())
+    
+    # Build helpful error response based on the endpoint
+    if request.url.path == "/api/process-report":
+        example_body = {
+            "session_id": "your-unique-session-id",
+            "message": "Your observation or report text here",
+            "request_values": {
+                "operation_id": "your-operation-uuid (from InfoEx)",
+                "location_uuids": ["location-uuid-1", "location-uuid-2"],
+                "zone_name": "Your zone name (e.g., 'North Bowl')",
+                "date": "MM/DD/YYYY (e.g., '10/23/2025')"
+            },
+            "auto_submit": True  # Optional, defaults to true
+        }
+        
+        field_descriptions = {
+            "session_id": "A unique identifier for this conversation session",
+            "message": "The observation text from your guide (e.g., 'Size 2 avalanche observed')",
+            "request_values": "Required context for the submission",
+            "request_values.operation_id": "Your Aurora Backcountry operation UUID from InfoEx",
+            "request_values.location_uuids": "Array of location UUIDs where observation occurred",
+            "request_values.zone_name": "The zone/area name for context",
+            "request_values.date": "Today's date in MM/DD/YYYY format",
+            "auto_submit": "If true, automatically submits to InfoEx when ready (default: true)"
+        }
+    elif request.url.path == "/api/submit-to-infoex":
+        example_body = {
+            "session_id": "your-session-id",
+            "submission_types": ["avalanche_observation", "field_summary"]
+        }
+        
+        field_descriptions = {
+            "session_id": "The session ID containing payloads ready for submission",
+            "submission_types": "Optional array of observation types to submit (submits all ready payloads if omitted)"
+        }
+    else:
+        example_body = None
+        field_descriptions = None
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": "Invalid request format",
+            "message": "Your request body is missing required fields or has invalid data",
+            "validation_errors": exc.errors(),
+            "correct_format": example_body,
+            "field_descriptions": field_descriptions,
+            "hint": "Copy the 'correct_format' object and replace the placeholder values with your actual data"
+        }
+    )
 
 
 # Global exception handler
