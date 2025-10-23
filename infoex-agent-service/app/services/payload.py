@@ -7,6 +7,7 @@ import structlog
 
 from app.models import Session, PayloadStatus
 from app.agent.constants import infoex_constants
+from app.config import settings
 
 logger = structlog.get_logger()
 
@@ -144,7 +145,7 @@ class PayloadBuilder:
         
         # Ensure state is set
         if "state" not in payload:
-            payload["state"] = "IN_REVIEW"
+            payload["state"] = settings.infoex_submission_state
         
         # Validate required fields
         required = infoex_constants.get_required_fields(observation_type)

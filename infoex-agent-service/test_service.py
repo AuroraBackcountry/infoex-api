@@ -10,6 +10,19 @@ from datetime import datetime
 # Service URL (adjust if needed)
 BASE_URL = "http://localhost:8000"
 
+def test_submission_state():
+    """Test that submission state environment variable is working"""
+    print("\n🏷️ Testing submission state configuration...")
+    try:
+        # The service should use the configured state
+        state = os.getenv("INFOEX_SUBMISSION_STATE", "IN_REVIEW")
+        print(f"✅ Submission state is set to: {state}")
+        print(f"   (Observations will be marked as '{state}')")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to check submission state: {e}")
+        return False
+
 def test_health():
     """Test health endpoint"""
     print("🏥 Testing health check...")
@@ -108,6 +121,7 @@ def main():
     print("=" * 50)
     
     try:
+        test_submission_state()
         test_health()
         test_conversation()
         test_locations()

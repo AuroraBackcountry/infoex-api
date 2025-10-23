@@ -59,6 +59,13 @@ REDIS_SESSION_PREFIX=session
 
 ## Optional Environment Variables
 
+### Submission State
+```
+INFOEX_SUBMISSION_STATE=IN_REVIEW
+```
+- `IN_REVIEW` (default) - Draft mode, safe for testing
+- `SUBMITTED` - Final submission, use for production
+
 ### Logging
 ```
 LOG_LEVEL=INFO

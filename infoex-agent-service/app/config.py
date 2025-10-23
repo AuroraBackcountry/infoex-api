@@ -39,6 +39,16 @@ class Settings(BaseSettings):
     # Shared InfoEx Configuration
     operation_uuid: str = Field(..., description="Aurora Backcountry operation UUID")
     
+    # InfoEx Submission State
+    infoex_submission_state: str = Field(default="IN_REVIEW", description="Submission state: IN_REVIEW or SUBMITTED")
+    
+    @validator("infoex_submission_state")
+    def validate_submission_state(cls, v):
+        """Ensure submission state is valid"""
+        if v not in ["IN_REVIEW", "SUBMITTED"]:
+            raise ValueError("INFOEX_SUBMISSION_STATE must be either 'IN_REVIEW' or 'SUBMITTED'")
+        return v
+    
     # Active InfoEx Configuration (set based on environment)
     infoex_api_key: Optional[str] = Field(default=None, description="Active InfoEx API key")
     infoex_operation_uuid: Optional[str] = Field(default=None, description="Active operation UUID")
