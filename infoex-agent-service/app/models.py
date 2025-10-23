@@ -41,6 +41,10 @@ class ProcessReportRequest(BaseModel):
     message: str = Field(..., description="User message to process")
     request_values: RequestValues = Field(..., description="Request-specific values from n8n")
     auto_submit: bool = Field(default=True, description="Automatically submit to InfoEx when ready")
+    submission_state: Optional[str] = Field(
+        default=None, 
+        description="Override submission state: IN_REVIEW or SUBMITTED (uses env default if not provided)"
+    )
 
 
 class ProcessReportResponse(BaseModel):
@@ -55,6 +59,10 @@ class SubmissionRequest(BaseModel):
         ...,
         description="List of observation types to submit",
         example=["field_summary", "avalanche_observation", "hazard_assessment"]
+    )
+    submission_state: Optional[str] = Field(
+        default=None,
+        description="Override submission state: IN_REVIEW or SUBMITTED (uses env default if not provided)"
     )
 
 

@@ -121,7 +121,8 @@ class PayloadBuilder:
     def build_payload(
         self,
         observation_type: str,
-        session: Session
+        session: Session,
+        submission_state: Optional[str] = None
     ) -> Tuple[Optional[Dict[str, Any]], List[str]]:
         """Build payload for observation type from session data"""
         
@@ -143,9 +144,9 @@ class PayloadBuilder:
         payload["locationUUIDs"] = session.request_values.location_uuids
         payload["operationUUID"] = session.request_values.operation_id
         
-        # Ensure state is set
+        # Ensure state is set (use provided value, or env default)
         if "state" not in payload:
-            payload["state"] = settings.infoex_submission_state
+            payload["state"] = submission_state or settings.infoex_submission_state
         
         # Validate required fields
         required = infoex_constants.get_required_fields(observation_type)

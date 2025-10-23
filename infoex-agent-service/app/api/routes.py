@@ -74,8 +74,12 @@ async def process_report(request: ProcessReportRequest):
                 # Auto-submit ready payloads
                 submission_results = []
                 for obs_type in ready_types:
-                    # Build payload
-                    payload_data, errors = payload_builder.build_payload(obs_type, updated_session)
+                    # Build payload (with optional submission state override)
+                    payload_data, errors = payload_builder.build_payload(
+                        obs_type, 
+                        updated_session,
+                        request.submission_state
+                    )
                     
                     if not errors:
                         # Submit to InfoEx
@@ -136,8 +140,12 @@ async def submit_to_infoex(request: SubmissionRequest):
                 overall_success = False
                 continue
             
-            # Build payload
-            payload, errors = payload_builder.build_payload(obs_type, session)
+            # Build payload (with optional submission state override)
+            payload, errors = payload_builder.build_payload(
+                obs_type, 
+                session,
+                request.submission_state
+            )
             
             if errors:
                 submission = {

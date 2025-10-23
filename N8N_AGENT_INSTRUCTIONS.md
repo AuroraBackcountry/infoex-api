@@ -305,7 +305,8 @@ If user asks "show me the payload", display the full JSON that will be sent:
     "zone_name": "Your Zone",
     "date": "10/23/2025"
   },
-  "auto_submit": true
+  "auto_submit": true,
+  "submission_state": "IN_REVIEW"  // Optional: Override draft/final state
 }
 ```
 
@@ -383,6 +384,15 @@ When sending data to the Claude agent service, configure your HTTP Request node 
 3. `request_values` must include all four required fields
 4. `location_uuids` must be an array (even if just one location)
 5. Date must be in MM/DD/YYYY format
+
+### Submission State Control (Optional)
+Add `submission_state` to override whether observations are drafts or final:
+- **"IN_REVIEW"**: Save as draft for review (default)
+- **"SUBMITTED"**: Mark as final/complete
+
+This parameter is optional. If not included, the service uses its environment default.
+
+In the future, your web app will have a toggle to control this per submission.
 
 ### Example Complete Request:
 ```json

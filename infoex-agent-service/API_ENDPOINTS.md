@@ -29,7 +29,8 @@
       "location_uuids": ["location-uuid-1", "location-uuid-2"],
       "zone_name": "Your Zone Name",
       "date": "MM/DD/YYYY"
-    }
+    },
+    "submission_state": "IN_REVIEW"  // Optional: "IN_REVIEW" or "SUBMITTED"
   }
   ```
 - **Response**: Plain text response from Claude
@@ -42,7 +43,8 @@
   ```json
   {
     "session_id": "unique-session-id",
-    "submission_types": ["avalanche_observation", "field_summary"]
+    "submission_types": ["avalanche_observation", "field_summary"],
+    "submission_state": "IN_REVIEW"  // Optional: "IN_REVIEW" or "SUBMITTED"
   }
   ```
 - **Response**:

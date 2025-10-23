@@ -59,12 +59,18 @@ REDIS_SESSION_PREFIX=session
 
 ## Optional Environment Variables
 
-### Submission State
+### Submission State (Default Setting)
 ```
 INFOEX_SUBMISSION_STATE=IN_REVIEW
 ```
-- `IN_REVIEW` (default) - Draft mode, safe for testing
-- `SUBMITTED` - Final submission, use for production
+- `IN_REVIEW` (default) - Observations marked as drafts for review
+- `SUBMITTED` - Observations marked as final/complete
+
+**Note**: This is independent of staging/production environments. You can use:
+- `IN_REVIEW` with production environment (safe testing on live system)
+- `SUBMITTED` with staging environment (testing final submission flow)
+
+In the future, this will be controlled by a toggle in your web app.
 
 ### Logging
 ```
