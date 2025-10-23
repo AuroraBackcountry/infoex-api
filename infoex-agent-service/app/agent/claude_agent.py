@@ -170,6 +170,21 @@ class ClaudeAgent:
         # Look for observation types mentioned
         mentioned_types = self._detect_observation_types(user_message, claude_response)
         
+        # If user explicitly mentions submitting a specific type, focus on that
+        submit_keywords = {
+            "submit avalanche summary": "avalanche_summary",
+            "submit field summary": "field_summary",
+            "submit avalanche observation": "avalanche_observation",
+            "submit hazard assessment": "hazard_assessment",
+            "submit terrain observation": "terrain_observation",
+            "submit snowpack summary": "snowpack_summary"
+        }
+        
+        for keyword, obs_type in submit_keywords.items():
+            if keyword in user_message.lower():
+                mentioned_types = [obs_type]  # Focus only on the explicitly requested type
+                break
+        
         # Initialize payloads for mentioned types
         for obs_type in mentioned_types:
             if obs_type not in session.payloads:
@@ -185,10 +200,22 @@ class ClaudeAgent:
                     }
                 )
         
-        # Extract data from conversation (simplified example)
-        # In production, this would be much more sophisticated
+        # Extract data from conversation
+        # First check if Claude is ready to submit a specific type
+        submission_type = None
+        if "ready for" in claude_response.lower() and "submission" in claude_response.lower():
+            for obs_type in session.payloads:
+                if f"ready for {obs_type.replace('_', ' ')} submission" in claude_response.lower():
+                    submission_type = obs_type
+                    break
+        
+        # Update payloads based on conversation
         for obs_type, payload in session.payloads.items():
             if payload.status != "submitted":
+                # Only extract data for the specific submission type if identified
+                if submission_type and obs_type != submission_type:
+                    continue
+                    
                 # Update data based on conversation
                 extracted_data = self._extract_data_for_type(
                     obs_type, 
@@ -200,10 +227,28 @@ class ClaudeAgent:
                 # Merge extracted data
                 payload.data.update(extracted_data)
                 
+                # Ensure base fields are present
+                if "obDate" not in payload.data:
+                    payload.data["obDate"] = session.request_values.date
+                if "locationUUIDs" not in payload.data:
+                    payload.data["locationUUIDs"] = session.request_values.location_uuids
+                if "operationUUID" not in payload.data:
+                    payload.data["operationUUID"] = session.request_values.operation_id
+                if "state" not in payload.data:
+                    payload.data["state"] = "IN_REVIEW"
+                
                 # Check if all required fields are present
                 required = set(infoex_constants.get_required_fields(obs_type))
                 present = set(payload.data.keys())
                 missing = required - present
+                
+                # Log extracted vs required for debugging
+                logger.info("payload_field_check",
+                           observation_type=obs_type,
+                           extracted_fields=list(extracted_data.keys()),
+                           all_fields=list(payload.data.keys()),
+                           required_fields=list(required),
+                           missing_fields=list(missing))
                 
                 payload.missing_fields = list(missing)
                 payload.status = "ready" if not missing else "incomplete"
@@ -225,15 +270,21 @@ class ClaudeAgent:
         """Detect which observation types are being discussed"""
         types = []
         
-        # Simple keyword detection - could be enhanced with NLP
+        # More specific keyword detection - prioritize explicit mentions
         keywords = {
             "field_summary": ["field summary", "daily summary", "operational summary"],
-            "avalanche_observation": ["avalanche", "size 2", "storm slab", "wind slab"],
-            "avalanche_summary": ["avalanche activity", "avalanches observed"],
-            "hazard_assessment": ["hazard", "rating", "alpine", "treeline"],
-            "snowpack_summary": ["snowpack", "layers", "snow structure"],
-            "terrain_observation": ["terrain", "ates", "strategic mindset"]
+            "avalanche_observation": ["avalanche observation", "individual avalanche", "size 2", "size 3"],
+            "avalanche_summary": ["avalanche summary", "avalanches observed", "percent area observed"],
+            "hazard_assessment": ["hazard assessment", "danger rating", "avalanche problems"],
+            "snowpack_summary": ["snowpack summary", "snowpack structure", "snow layers"],
+            "terrain_observation": ["terrain observation", "ates rating", "strategic mindset"]
         }
+        
+        # Check for explicit submission mentions in Claude's response
+        if "ready for" in claude_response.lower() and "submission" in claude_response.lower():
+            for obs_type in keywords:
+                if f"ready for {obs_type.replace('_', ' ')} submission" in claude_response.lower():
+                    return [obs_type]  # Return only the specific type being submitted
         
         combined_text = (user_message + " " + claude_response).lower()
         
