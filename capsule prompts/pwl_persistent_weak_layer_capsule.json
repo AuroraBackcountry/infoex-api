@@ -1,0 +1,71 @@
+{
+  "capsule_type": "pwl_persistent_weak_layer",
+  
+  "question": "Have you identified a new persistent weak layer that needs tracking? Please provide: A descriptive name (e.g., 'Surface Hoar 2025-02-15'), the date it was created/identified, and a comprehensive comment describing formation conditions, burial details, current depth, spatial distribution, stability test results, and ongoing concerns.",
+  
+  "payload": {
+    "name": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "format": "Include crystal type and date (e.g., 'Surface Hoar 2025-02-15')"
+    },
+    "creationDate": {
+      "value": null,
+      "type": "string",
+      "format": "yyyy-mm-dd",
+      "required": true,
+      "validation": "iso_date_format"
+    },
+    "color": {
+      "value": "#FF6E53",
+      "type": "string",
+      "required": false,
+      "enum": ["#FF6E53", "#FFC911", "#8ECF1B", "#35A7FF"],
+      "enum_labels": {
+        "#FF6E53": "Red/Orange - Active concern",
+        "#FFC911": "Yellow - Moderate concern",
+        "#8ECF1B": "Green - Dormant/healing",
+        "#35A7FF": "Blue - Alternative"
+      }
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": true,
+      "inherited": true
+    },
+    "comment": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096,
+      "prompt": "Include: formation conditions, burial event, current depth, distribution (aspects/elevations), stability tests, concerns"
+    },
+    "assessment": {
+      "value": [],
+      "type": "array",
+      "required": false,
+      "note": "Assessments must be added via InfoEx UI - cannot be submitted via API"
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [
+      "name",
+      "creationDate"
+    ],
+    "aurora_ideal_missing": [
+      "color",
+      "comment"
+    ],
+    "validation_errors": []
+  },
+  
+  "special_notes": {
+    "frequency": "Only create 2-3 PWLs per season when new persistent weak layers are identified",
+    "workflow": "1) Check if PWL exists (GET), 2) Create if new (POST), 3) Add assessments via InfoEx UI",
+    "api_limitation": "PWL assessments cannot be added via API - use InfoEx web interface"
+  }
+}

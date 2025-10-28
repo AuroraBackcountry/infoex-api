@@ -20,6 +20,19 @@ curl -H "api_key: <api_key>" -H "operation: <operation_uuid>" https://staging-ca
 
 ---
 
+## 📐 OGRS Measurement Standards Reference
+
+**Key Snow Measurement Conventions** (Per Canadian Avalanche Association OGRS):
+- **HS (Height of Snow)**: Total snow depth measured vertically from ground to snow surface
+- **HN24 (24-hour new snow)**: Measured on 24-hour board, cleared after morning observation
+  - Important: HN24 may exceed HS in early season when snowpack is shallow
+- **HST (Storm snow)**: Total accumulation since storm start, cleared after storm ends
+- **All measurements**: Taken vertically (line of plumb) per OGRS standards
+
+**Reference**: Canadian Avalanche Association - Observation Guidelines and Recording Standards (OGRS)
+
+---
+
 ## 📍 Location Management
 
 ### GET /location
@@ -207,7 +220,7 @@ curl -H "api_key: <api_key>" -H "operation: <operation_uuid>" \
 - `G` - Graupel and hail
 - `ZR` - Freezing rain
 
-**Snow Intensity Codes**:
+**Snow Intensity Codes** (Per OGRS Standards):
 - `S-1` - Snow accumulates at a rate of less than 1 cm per hour
 - `S1` - Snow accumulates at a rate of about 1 cm per hour
 - `S2` - Snow accumulates at a rate of about 2 cm per hour
@@ -219,6 +232,8 @@ curl -H "api_key: <api_key>" -H "operation: <operation_uuid>" \
 - `S8` - Snow accumulates at a rate of about 8 cm per hour
 - `S9` - Snow accumulates at a rate of about 9 cm per hour
 - `S10` - Snow accumulates at a rate of about 10 cm per hour
+
+**Note**: Aurora now supports the full S1-S10 intensity range (previously S1-S5)
 
 **Rain Intensity Codes**:
 - `RV` - Very light rain; would not wet or cover a surface regardless of duration
@@ -574,6 +589,8 @@ curl -H "api_key: <api_key>" -H "operation: <operation_uuid>" \
 - `5` - Largest snow avalanche known. Could destroy a village or a forest area of approximately 40 hectares (10⁵ t, 3,000 m path length, 1,000 kPa impact pressure)
 
 **Note**: Half sizes (1.5, 2.5, 3.5, 4.5) may be used by experienced practitioners for avalanches which are midway between defined avalanche size classes.
+
+**InfoEx API Mapping**: Aurora D-scale values 0.5-5 are mapped to InfoEx accepted sizes (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5). Values are clamped/rounded to the nearest valid half-step when exporting to InfoEx.
 
 **Snow Failure Type Codes (InfoEx API)**:
 - `S` - Slab avalanche

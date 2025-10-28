@@ -1,0 +1,102 @@
+{
+  "capsule_type": "initial_data_collection",
+  
+  "question": "Let's get started with your operational report. I need some basic information that will apply to all your observations today. Please tell me: Is this report for today ({{today_date}})? Which zone did you operate in? Were there other guides working with you (and their names)? What time did your operational day start and end? How many guests did you have? What were your main objectives or routes? And can you give me a brief summary of how the day went?",
+  
+  "payload": {
+    "report_date": {
+      "value": null,
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "default": "{{today_date}}"
+    },
+    "zone_name": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "validation": "must_match_available_zones"
+    },
+    "location_uuids": {
+      "value": [],
+      "type": "array",
+      "required": true,
+      "derived_from": "zone_name"
+    },
+    "guides": {
+      "value": [
+        {
+          "name": "{{user_name}}",
+          "uuid": "{{user_uuid}}"
+        }
+      ],
+      "type": "array",
+      "required": true,
+      "min_items": 1
+    },
+    "start_time": {
+      "value": null,
+      "type": "string",
+      "format": "HH:MM",
+      "required": true,
+      "validation": "24_hour_format"
+    },
+    "end_time": {
+      "value": null,
+      "type": "string",
+      "format": "HH:MM",
+      "required": true,
+      "validation": "24_hour_format_after_start"
+    },
+    "guest_count": {
+      "value": null,
+      "type": "integer",
+      "required": false,
+      "validation": "positive_integer"
+    },
+    "objectives": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 200
+    },
+    "daily_summary": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 500
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [
+      "report_date",
+      "zone_name",
+      "location_uuids",
+      "start_time",
+      "end_time"
+    ],
+    "validation_errors": []
+  },
+  
+  "constants_populated": {
+    "operation_uuid": "{{operation_uuid}}",
+    "user_name": "{{user_name}}",
+    "user_uuid": "{{user_uuid}}",
+    "today_date": "{{today_date}}",
+    "timezone": "{{timezone}}"
+  },
+  
+  "fields_for_inheritance": {
+    "obDate": "{{payload.report_date.value}}",
+    "operationUUID": "{{constants_populated.operation_uuid}}",
+    "locationUUIDs": "{{payload.location_uuids.value}}",
+    "state": "IN_REVIEW",
+    "obStartTime": "{{payload.start_time.value}}",
+    "obEndTime": "{{payload.end_time.value}}",
+    "usersPresent": "{{payload.guides[*].uuid}}",
+    "observers": "{{payload.guides[*].uuid}}",
+    "observersString": "{{payload.guides[*].name.join(', ')}}"
+  }
+}

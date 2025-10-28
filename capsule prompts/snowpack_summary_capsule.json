@@ -1,0 +1,66 @@
+{
+  "capsule_type": "snowpack_summary",
+  
+  "question": "Please provide your snowpack summary for today. Describe the overall snowpack structure, any weak layers of concern, their distribution across aspects and elevations, stability test results summary, and your overall assessment of snowpack conditions.",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "obTime": {
+      "value": "{{inherited.obEndTime}}",
+      "type": "string",
+      "format": "HH:MM",
+      "required": false,
+      "inherited": true
+    },
+    "snowpackSummary": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "attachments": {
+      "value": [],
+      "type": "array",
+      "required": false
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": false,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": false,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    },
+    "shareLevel": {
+      "value": "PRIVATE",
+      "type": "string",
+      "required": false,
+      "enum": ["EXCHANGE", "PRIVATE"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [],
+    "aurora_ideal_missing": [
+      "snowpackSummary"
+    ],
+    "validation_errors": []
+  }
+}

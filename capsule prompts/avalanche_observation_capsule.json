@@ -1,0 +1,189 @@
+{
+  "capsule_type": "avalanche_observation",
+  
+  "question": "Did you observe any avalanches today? For each avalanche, please provide: How many avalanches (1, 2, 3, etc. or Numerous)? What type (Storm Slab, Wind Slab, Persistent Slab, Deep Persistent Slab, Wet Slab, Loose Dry, Loose Wet, Cornice, Glide, Unknown)? What triggered it (Natural, Skier, Explosives, etc.)? Size (1-5 scale)? What aspect and elevation? How wide and long? Slab depth? When did it occur relative to when you saw it? Any additional details about the avalanche?",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "obTime": {
+      "value": null,
+      "type": "string",
+      "format": "HH:MM",
+      "required": true,
+      "validation": "24_hour_format"
+    },
+    "num": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "20", "50", "100", "Iso", "Sev", "Num", "NR", "Unknown"]
+    },
+    "trigger": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "enum": ["Na", "Nc", "Ne", "Ni", "Nr", "Xa", "Xb", "Xc", "Xd", "Xe", "Xg", "Xh", "Xhg", "Xl", "Xp", "Xt", "Xr", "Xy", "Ha", "Hc", "Hr", "Hy", "Va", "Vc", "Vr", "Vy", "Sa", "Sc", "Sr", "Sy", "Ma", "Mc", "Mr", "My", "O", "U"]
+    },
+    "character": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "enum": ["LOOSE_DRY_AVALANCHE", "LOOSE_WET_AVALANCHE", "STORM_SLAB", "WIND_SLAB", "PERSISTENT_SLAB", "DEEP_PERSISTENT_SLAB", "WET_SLAB", "GLIDE", "CORNICE", "UNKNOWN"]
+    },
+    "sizeMin": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:1:5,step:0.5"
+    },
+    "sizeMax": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:1:5,step:0.5,gte:sizeMin"
+    },
+    "size": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]
+    },
+    "aspectFrom": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "VAR", "ALL"]
+    },
+    "aspectTo": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "VAR", "ALL"]
+    },
+    "elevationMin": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:5000"
+    },
+    "elevationMax": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:5000,gte:elevationMin"
+    },
+    "inclineMin": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:90"
+    },
+    "inclineMax": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:90,gte:inclineMin"
+    },
+    "width": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:10000"
+    },
+    "length": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:10000"
+    },
+    "depthMin": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:1000"
+    },
+    "depthMax": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:1000,gte:depthMin"
+    },
+    "depthAvg": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:1000"
+    },
+    "occurrenceTime": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["Observed", "The avalanche was observed in motion on the observation date and time", "The avalanche occurred in the 12 hours before...", "...between 12 and 24 hours before...", "...between 24 and 48 hours before...", "...between 48 and 72 hours before...", "...more than 72 hours before..."]
+    },
+    "occurrenceTimezone": {
+      "value": "{{inherited.timezone}}",
+      "type": "string",
+      "required": false,
+      "inherited": true
+    },
+    "comments": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": false,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [
+      "obTime",
+      "num",
+      "trigger",
+      "character"
+    ],
+    "aurora_ideal_missing": [
+      "sizeMin",
+      "sizeMax",
+      "size",
+      "aspectFrom",
+      "aspectTo",
+      "elevationMin",
+      "elevationMax",
+      "inclineMin",
+      "inclineMax",
+      "width",
+      "length",
+      "depthMin",
+      "depthMax",
+      "depthAvg",
+      "occurrenceTime",
+      "comments"
+    ],
+    "validation_errors": []
+  }
+}

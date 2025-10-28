@@ -2,6 +2,7 @@
   "_comment": "InfoEx Hazard Assessment Payload - Copy/Paste Ready",
   "_endpoint": "POST /observation/hazardAssessment",
   "_description": "Submit hazard assessment observation to InfoEx API. Complex observation with avalanche problems and hazard ratings by elevation band.",
+  "_exporter_note": "AURORA EXPORTER: Ensure required fields (obDate, state) are populated. Use confirmed values from propose→confirm workflow. Send hazardRatings and avalancheProblems as arrays matching InfoEx schema structure.",
   
   "obDate": "10/07/2025",
   "_obDate_constraint": "REQUIRED. Date format: MM/DD/YYYY. Must be valid calendar date, typically within 7 days of current date for operational reports.",

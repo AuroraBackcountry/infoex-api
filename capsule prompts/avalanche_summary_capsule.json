@@ -1,0 +1,69 @@
+{
+  "capsule_type": "avalanche_summary",
+  
+  "question": "Let me get your overall avalanche summary for the day. Did you observe any new avalanches, no new avalanches, or just sluffing/pinwheeling? What percentage of your operational area were you able to observe for avalanche activity? Please provide any comments about overall avalanche conditions, activity patterns, or notable observations.",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "avalanchesObserved": {
+      "value": null,
+      "type": "string",
+      "required": true,
+      "enum": ["New avalanches", "No new avalanches", "Sluffing/Pinwheeling only"]
+    },
+    "percentAreaObserved": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:100"
+    },
+    "comments": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "explosivesRecords": {
+      "value": [],
+      "type": "array",
+      "required": false,
+      "note": "Not used by Aurora Backcountry"
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": true,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [
+      "avalanchesObserved"
+    ],
+    "aurora_ideal_missing": [
+      "percentAreaObserved",
+      "comments"
+    ],
+    "validation_errors": []
+  }
+}

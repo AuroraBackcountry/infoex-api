@@ -1,0 +1,176 @@
+{
+  "capsule_type": "hazard_assessment",
+  
+  "question": "Now I need your hazard assessment. First, what are your hazard ratings for Alpine, Treeline, and Below Treeline (1-5 scale)? What's your confidence level (Low/Moderate/High)? Next, what avalanche problems existed today? For each problem, tell me: Problem type (Storm Slab, Wind Slab, etc.), which aspects and elevation bands affected, distribution (Isolated/Specific/Widespread), sensitivity (Unreactive/Stubborn/Reactive/Touchy), expected size (1-5), and any specific comments about the problem.",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "obTime": {
+      "value": "{{inherited.obEndTime}}",
+      "type": "string",
+      "format": "HH:MM",
+      "required": true,
+      "inherited": true
+    },
+    "assessmentType": {
+      "value": "Nowcast",
+      "type": "string",
+      "required": true,
+      "enum": ["Forecast", "Nowcast"]
+    },
+    "usersPresent": {
+      "value": "{{inherited.usersPresent}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "hazardRatings": {
+      "value": [
+        {
+          "elevationBand": "Alpine",
+          "hazardRating": null,
+          "confidence": null,
+          "comment": null,
+          "locationUUIDs": "{{inherited.locationUUIDs}}",
+          "operationUUID": "{{inherited.operationUUID}}",
+          "obDate": "{{inherited.obDate}}",
+          "state": "IN_REVIEW"
+        },
+        {
+          "elevationBand": "Treeline",
+          "hazardRating": null,
+          "confidence": null,
+          "comment": null,
+          "locationUUIDs": "{{inherited.locationUUIDs}}",
+          "operationUUID": "{{inherited.operationUUID}}",
+          "obDate": "{{inherited.obDate}}",
+          "state": "IN_REVIEW"
+        },
+        {
+          "elevationBand": "Below Treeline",
+          "hazardRating": null,
+          "confidence": null,
+          "comment": null,
+          "locationUUIDs": "{{inherited.locationUUIDs}}",
+          "operationUUID": "{{inherited.operationUUID}}",
+          "obDate": "{{inherited.obDate}}",
+          "state": "IN_REVIEW"
+        }
+      ],
+      "type": "array",
+      "required": true,
+      "structure": {
+        "hazardRating": {
+          "type": "string",
+          "required": true,
+          "enum": ["1", "2", "3", "4", "5", "n/a"]
+        },
+        "confidence": {
+          "type": "string",
+          "required": false,
+          "enum": ["Low", "Moderate", "High"]
+        }
+      }
+    },
+    "avalancheProblems": {
+      "value": [],
+      "type": "array",
+      "required": true,
+      "max_items": 3,
+      "item_structure": {
+        "obDate": "{{inherited.obDate}}",
+        "character": {
+          "type": "string",
+          "required": true,
+          "enum": ["LOOSE_DRY_AVALANCHE", "LOOSE_WET_AVALANCHE", "STORM_SLAB", "WIND_SLAB", "PERSISTENT_SLAB", "DEEP_PERSISTENT_SLAB", "WET_SLAB", "GLIDE", "CORNICE", "UNKNOWN"]
+        },
+        "colour": {
+          "type": "string",
+          "required": false,
+          "auto_mapped": true
+        },
+        "location": {
+          "type": "string",
+          "required": true,
+          "format": "JSON_string"
+        },
+        "hazardChart": {
+          "type": "string",
+          "required": true,
+          "format": "JSON_string",
+          "auto_calculated": true
+        },
+        "distribution": {
+          "type": "string",
+          "required": true,
+          "enum": ["Isolated", "Specific", "Widespread"]
+        },
+        "sensitivity": {
+          "type": "string",
+          "required": true,
+          "enum": ["Unreactive", "Stubborn", "Reactive", "Touchy"]
+        },
+        "typicalSize": {
+          "type": "string",
+          "required": true,
+          "enum": ["Size1", "Size15", "Size2", "Size25", "Size3", "Size35", "Size4", "Size45", "Size5"]
+        },
+        "comment": {
+          "type": "string",
+          "required": false,
+          "max_length": 4096
+        },
+        "locationUUIDs": "{{inherited.locationUUIDs}}",
+        "operationUUID": "{{inherited.operationUUID}}",
+        "state": "IN_REVIEW"
+      }
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": true,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    },
+    "shareLevel": {
+      "value": "PRIVATE",
+      "type": "string",
+      "required": false,
+      "enum": ["EXCHANGE", "PRIVATE"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [
+      "hazardRatings[0].hazardRating",
+      "hazardRatings[1].hazardRating",
+      "hazardRatings[2].hazardRating",
+      "avalancheProblems"
+    ],
+    "aurora_ideal_missing": [
+      "hazardRatings[*].confidence",
+      "hazardRatings[*].comment",
+      "at_least_one_avalanche_problem",
+      "shareLevel"
+    ],
+    "validation_errors": []
+  }
+}

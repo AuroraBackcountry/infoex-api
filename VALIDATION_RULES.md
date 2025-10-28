@@ -42,17 +42,39 @@ The reports are generated through a two-agent system:
 ### Geographic and Location Fields
 
 #### Zone Names
-Based on observed patterns, valid zones include:
-- Whistler Blackcomb (various sub-zones)
-- Duffey, Cayoosh
-- Sea to Sky Gondola (STSG)
-- Decker Mountain
-- Musical Bumps
-- Corral Zone
-- Armchair Glacier
-- Ledge Trees
 
-**Validation**: Must match approved operational areas list
+**Data Sources**:
+- **Primary Source**: InfoEx API GET `/location` endpoint
+- **Secondary Source**: Supabase database with synchronized zone data
+
+**Zone Structure**:
+1. **Zone Name**: Official operational area name (e.g., "Sea to Sky Gondola", "Glacier National Park")
+2. **Zone UUID**: Unique identifier assigned by InfoEx system
+3. **Sub-locations**: Specific areas within a zone stored as JSONB in Supabase
+
+**Sub-location Examples**:
+
+*Sea to Sky Gondola Zone*:
+- Exit Gully
+- Ledge Trees
+- Cleavage Couloir
+
+*Glacier National Park Zone*:
+- Video Peak
+- Balu Pass
+- Asulkan Drainage
+- Rogers Pass
+
+**Data Management**:
+- Zones can be added, modified, or deleted in InfoEx
+- Changes are synchronized to Supabase database
+- Sub-locations are managed independently in Supabase
+
+**Validation Rules**:
+- Zone name must match exactly with InfoEx-approved operational areas
+- Zone UUID must be valid and active in InfoEx system
+- Sub-locations must belong to their parent zone
+- Case-sensitive matching for zone names
 
 #### Elevation References
 - **Format**: Integer values in meters
@@ -84,18 +106,20 @@ Based on observed patterns, valid zones include:
 - **Format**: Integer or decimal values
 
 #### Precipitation
-- **Types**: None, Nil, Snowing, Rain, Mixed
-- **Intensity Codes**: S1, S2, S3, S4, S5 (InfoEx standard)
+- **Types**: NIL, Snowing, Rain, Mixed
+- **Intensity Codes**: S1, S2, S3, S4, S5, S6, S7, S8, S9, S10 (InfoEx standard)
 - **Parsing**: Extract intensity from phrases like "Snowing at S2 intensity"
 
 #### Snow Depth
 - **HS (Height of Snow)**: Total snow depth
   - Units: cm or m (convert m to cm: 2m → 200cm)
   - Range: 0-1000cm typical
+  - Measured vertically from ground to snow surface
 - **HN24**: New snow in 24 hours
   - Units: cm
   - Range: 0-100cm typical
-  - Must be ≤ HS
+  - Per OGRS standards: May exceed HS in early season conditions
+  - Measured on 24-hour board, cleared after morning observation
 
 #### Sky Conditions
 - **Standard Terms**: Clear, BKN (Broken), Overcast, Obscure
@@ -199,12 +223,15 @@ If avalanches are observed, ALL of the following fields become required:
 
 ### Strategic Mindset Categories
 
-#### Standard Approaches
+#### Approved Categories
 - **Status Quo**: Normal operations with standard precautions
+- **Maintenance**: Maintaining current approach with minor adjustments
+- **Entrenchment**: Digging in and holding position due to conditions
+- **Stepping Out**: Gradually expanding operational terrain
+- **Open Season**: Full terrain utilization with good conditions
+- **Assessment**: Evaluating conditions before committing
+- **Stepping Back**: Reducing terrain exposure due to concerns
 - **Spring Diurnal**: Focus on timing and solar aspects
-- **Heightened Awareness**: Increased caution due to conditions
-- **Conservative**: Avoiding higher-risk terrain
-- **Aggressive**: Accepting higher risk for objectives
 
 ## Data Quality Checks
 
@@ -267,7 +294,7 @@ If avalanches are observed, ALL of the following fields become required:
 
 ### InfoEx Observation Types
 Aurora submits the following observation types to InfoEx:
-1. **Field Summary** (`/observation/fieldSummary`) - Daily operational report with weather
+1. **Field Summary** (`/observation/fieldSummary`) - Daily operational report INCLUDING weather observations
 2. **Avalanche Summary** (`/observation/avalancheSummary`) - Avalanche activity overview
 3. **Snowpack Summary** (`/observation/snowpackAssessment`) - General snowpack conditions
 4. **Snow Profile Observation** (`/observation/snowpack`) - Detailed snow profiles
@@ -276,7 +303,11 @@ Aurora submits the following observation types to InfoEx:
 7. **Terrain Observation** (`/observation/terrain`) - Terrain considerations
 8. **PWL** (`/pwl`) - Persistent weak layer tracking
 
-**Note**: Aurora does NOT submit weather observations (`/observation/weather`) as it is not a weather station operation.
+**Important Clarification**: 
+- Aurora submits **field observations** which INCLUDE weather data via `/observation/fieldSummary`
+- Aurora does NOT use `/observation/weather` endpoint (reserved for automated weather stations)
+- Field observations are guide-based and include weather as part of operational context
+- Weather stations submit continuous automated data to `/observation/weather`
 
 ### Payload Templates
 All working payload templates are available in `infoex-api-payloads/`:

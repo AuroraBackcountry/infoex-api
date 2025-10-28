@@ -11,7 +11,7 @@ curl -X POST https://infoex-api.onrender.com/api/process-report \
   -d '{
     "session_id": "test-123",
     "message": "Submit avalanche observation - size 3 storm slab at north aspect 2100m",
-    "fixed_values": {...}
+    "inherited_values": {...}
   }'
 ```
 
@@ -56,16 +56,9 @@ Your n8n workflow should:
 3. If ready, call `/api/submit-to-infoex`
 4. Handle the submission response
 
-## Auto-Submit Option (Future)
+## Submission Trigger
 
-We could add an `auto_submit` flag to process-report:
-```json
-{
-  "session_id": "test-123",
-  "message": "Submit avalanche observation...",
-  "auto_submit": true,
-  "fixed_values": {...}
-}
-```
-
-This would combine both steps if Claude validates successfully.
+Submissions are triggered manually after validation:
+- All submissions use `state: "IN_REVIEW"` by default
+- This keeps reports in draft mode for review in InfoEx UI
+- Future enhancement: Allow `state: "SUBMITTED"` for final submissions

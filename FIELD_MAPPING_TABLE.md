@@ -83,17 +83,19 @@ POST /observation/hazardAssessment
 
 ## Direct Field Mappings (No Transformation Needed)
 
-### Weather Observations
-| Aurora Field | InfoEx Field | Notes |
-|------------------|-------------|---------------|------------------|
-| `weather_observations.temperature.max_temp.value` | `tempMax` | WeatherObservationLightDTO | Direct numeric mapping |
-| `weather_observations.temperature.min_temp.value` | `tempMin` | WeatherObservationLightDTO | Direct numeric mapping |
-| `weather_observations.wind.direction.value` | `windDirection` | WeatherObservationLightDTO | Use OGRS code (N, NE, E, etc.) |
-| `weather_observations.wind.speed.value` | `windSpeed` | WeatherObservationLightDTO | Convert to OGRS code (C, L, M, S, X, V) |
-| `weather_observations.precipitation.intensity.value` | `precip` | WeatherObservationLightDTO | Use S1-S5 codes |
-| `weather_observations.snow_depth.hs.value` | `hs` | WeatherObservationLightDTO | Convert to cm if needed |
-| `weather_observations.snow_depth.hn24.value` | `hn24` | WeatherObservationLightDTO | Direct numeric mapping |
-| `weather_observations.sky_conditions.value` | `sky` | WeatherObservationLightDTO | Use OGRS sky codes |
+### Field Summary Weather Data (NOT Weather Station Endpoint)
+**Important**: These weather fields are part of the Field Summary observation (`/observation/fieldSummary`), NOT the weather station endpoint (`/observation/weather`).
+
+| Aurora Field | InfoEx Field | Endpoint | Notes |
+|------------------|-------------|----------|---------------|
+| `weather_observations.temperature.max_temp.value` | `tempHigh` | `/observation/fieldSummary` | Direct numeric mapping |
+| `weather_observations.temperature.min_temp.value` | `tempLow` | `/observation/fieldSummary` | Direct numeric mapping |
+| `weather_observations.wind.direction.value` | `windDirection` | `/observation/fieldSummary` | Use OGRS code (N, NE, E, etc.) |
+| `weather_observations.wind.speed.value` | `windSpeed` | `/observation/fieldSummary` | Convert to OGRS code (C, L, M, S, X, V) |
+| `weather_observations.precipitation.intensity.value` | `precip` | `/observation/fieldSummary` | Use S1-S10 codes |
+| `weather_observations.snow_depth.hs.value` | `hs` | `/observation/fieldSummary` | Convert to cm if needed |
+| `weather_observations.snow_depth.hn24.value` | `hn24` | `/observation/fieldSummary` | Direct numeric mapping |
+| `weather_observations.sky_conditions.value` | `sky` | `/observation/fieldSummary` | Use OGRS sky codes |
 
 ### Report Metadata
 | Aurora Field Path | InfoEx Field | InfoEx Schema | Conversion Notes |
@@ -109,15 +111,18 @@ POST /observation/hazardAssessment
 | `avalanche_problems.problems[].type.value` | `character` | AvalancheProblemDTO | Map to ENUM (STORM_SLAB, etc.) |
 | `avalanche_problems.problems[].location.value` | `location` | AvalancheProblemDTO | Direct text mapping |
 | `avalanche_problems.problems[].distribution.value` | `distribution` | AvalancheProblemDTO | Direct mapping (Isolated, Specific, Widespread) |
-| `avalanche_problems.problems[].likelihood.value` | `sensitivity` | AvalancheProblemDTO | Map Unlikely→Unreactive, Possible→Stubborn, etc. |
+| `avalanche_problems.problems[].sensitivity.value` | `sensitivity` | AvalancheProblemDTO | Map internal sensitivity (Unreactive/Stubborn/Reactive/Touchy) to InfoEx sensitivity directly; internal likelihood is derived and does not map directly |
 | `avalanche_problems.problems[].size.value` | `typicalSize` | AvalancheProblemDTO | Map 1→Size1, 1.5→Size15, etc. |
 
 ### Hazard Assessment
 | Aurora Field Path | InfoEx Field | InfoEx Schema | Conversion Notes |
 |------------------|-------------|---------------|------------------|
-| `hazard_assessment.alpine.value` | `hazardRatings[0].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "ALP" |
-| `hazard_assessment.treeline.value` | `hazardRatings[1].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "TL" |
-| `hazard_assessment.below_treeline.value` | `hazardRatings[2].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "BTL" |
+| `hazard_assessment.alpine.confirmed.value` | `hazardRatings[0].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "ALP"; use confirmed values (post propose→confirm) |
+| `hazard_assessment.treeline.confirmed.value` | `hazardRatings[1].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "TL"; use confirmed values (post propose→confirm) |
+| `hazard_assessment.below_treeline.confirmed.value` | `hazardRatings[2].hazardRating` | HazardAssessmentDTO | Create array entry with elevationBand: "BTL"; use confirmed values (post propose→confirm) |
+| `hazard_assessment.alpine.confidence.value` | `hazardRatings[0].confidence` | HazardAssessmentDTO | Map to Low/Moderate/High confidence levels |
+| `hazard_assessment.treeline.confidence.value` | `hazardRatings[1].confidence` | HazardAssessmentDTO | Map to Low/Moderate/High confidence levels |
+| `hazard_assessment.below_treeline.confidence.value` | `hazardRatings[2].confidence` | HazardAssessmentDTO | Map to Low/Moderate/High confidence levels |
 
 ### Avalanche Observations (Conditional)
 | Aurora Field Path | InfoEx Field | InfoEx Schema | Conversion Notes |
@@ -175,17 +180,16 @@ function mapAvalancheCharacter(auroraType) {
 }
 ```
 
-### 4. Likelihood to Sensitivity Mapping
+### 4. Sensitivity Mapping (Direct)
 ```javascript
-function mapLikelihoodToSensitivity(likelihood) {
-  const mapping = {
-    "Unlikely": "Unreactive",
-    "Possible": "Stubborn", 
-    "Likely": "Reactive",
-    "Certain": "Touchy"
-  };
-  return mapping[likelihood] || "Stubborn";
+function mapSensitivity(sensitivity) {
+  // Direct mapping - no transformation needed
+  const validSensitivities = ["Unreactive", "Stubborn", "Reactive", "Touchy"];
+  return validSensitivities.includes(sensitivity) ? sensitivity : "Stubborn";
 }
+
+// Note: Likelihood is derived from Sensitivity × Distribution in-app
+// and does not map directly to InfoEx fields
 ```
 
 ### 5. Size Scale Conversion
@@ -223,34 +227,39 @@ function mapWindSpeed(auroraSpeed) {
 7. **Terrain Observation** (`POST /observation/terrain`) - Terrain considerations and ATES ratings
 8. **PWL Creation** (`POST /pwl`) - Persistent weak layer tracking (seasonal, 2-3 times per season)
 
-**Note**: Aurora does not submit weather observations (`POST /observation/weather`) as it's not a weather station operation. Weather data is captured in the field summary instead.
+**Important Clarification**: 
+- Aurora captures weather data as part of **field observations** (`POST /observation/fieldSummary`)
+- Aurora does NOT use the weather station endpoint (`POST /observation/weather`)
+- Field observations = guide-based weather data within operational context
+- Weather stations = automated continuous weather monitoring
 
 ### Batch Submission Strategy
 ```javascript
 async function submitAuroraReportToInfoEx(auroraReport) {
   const submissions = [];
   
-  // 1. Weather observation
-  submissions.push(await submitWeatherObservation(auroraReport));
-  
-  // 2. Field summary
+  // 1. Field summary (includes weather data)
   submissions.push(await submitFieldSummary(auroraReport));
   
-  // 3. Avalanche problems (multiple)
-  for (const problem of auroraReport.avalanche_problems.problems) {
-    submissions.push(await submitAvalancheProblem(problem, auroraReport));
+  // 2. Avalanche summary (if applicable)
+  if (auroraReport.avalanche_observations.avalanches_observed) {
+    submissions.push(await submitAvalancheSummary(auroraReport));
   }
   
-  // 4. Hazard assessment
+  // 3. Hazard assessment with problems
   submissions.push(await submitHazardAssessment(auroraReport));
   
-  // 5. Avalanche observations (conditional)
+  // 4. Avalanche observations (conditional)
   if (auroraReport.avalanche_observations.evidence_of_instability.observed) {
     submissions.push(await submitAvalancheObservation(auroraReport));
   }
   
-  // 6. General message
-  submissions.push(await submitGeneralMessage(auroraReport));
+  // 5. Snowpack summary (if collected)
+  if (auroraReport.snowpack_summary) {
+    submissions.push(await submitSnowpackSummary(auroraReport));
+  }
+  
+  // Note: Weather data is included in field summary, not submitted separately
   
   return submissions;
 }

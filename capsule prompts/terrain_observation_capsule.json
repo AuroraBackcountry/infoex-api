@@ -1,0 +1,82 @@
+{
+  "capsule_type": "terrain_observation",
+  
+  "question": "Tell me about the terrain you traveled in today. What was your terrain narrative (choices made, hazards avoided, decision rationale)? What ATES rating best describes your terrain (Simple/Challenging/Complex)? What was the maximum slope angle you encountered? What strategic mindset did you adopt (Assessment/Stepping Out/Status Quo/Stepping Back/Maintenance/Entrenchment/Open Season/Spring Diurnal)? What percentage of your operational area were you able to observe?",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "terrainNarrative": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "atesRating": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["Simple", "Challenging", "Complex"]
+    },
+    "maxSlopeAngle": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["<30", "30", "35", "40", "45", ">45"]
+    },
+    "strategicMindset": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["Assessment", "Stepping Out", "Status Quo", "Stepping Back", "Maintenance", "Entrenchment", "Open Season", "Spring Diurnal"]
+    },
+    "percentAreaObserved": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:100"
+    },
+    "terrainFeature": {
+      "value": [],
+      "type": "array",
+      "required": false,
+      "enum_values": ["Open Forest", "Closed Forest", "Cutblock", "Open Slopes", "Bowl", "Couloir", "Gully", "Concave", "Convex", "Planar", "Supported", "Unsupported", "Previously Skied", "Small Features", "Large Features", "Glaciated", "Start Zone", "Track", "Run Out"]
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": false,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": false,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [],
+    "aurora_ideal_missing": [
+      "terrainNarrative",
+      "atesRating",
+      "maxSlopeAngle",
+      "strategicMindset",
+      "percentAreaObserved"
+    ],
+    "validation_errors": []
+  }
+}

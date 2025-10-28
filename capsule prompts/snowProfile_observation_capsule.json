@@ -1,0 +1,101 @@
+{
+  "capsule_type": "snowProfile_observation",
+  
+  "question": "Did you dig any snow profiles today? For each profile, please provide: Elevation (meters), aspect (N/NE/E/SE/S/SW/W/NW), slope angle (degrees), summary of findings including stability tests (CT, ECT, PST results with notation), foot penetration depth, air temperature, and GPS coordinates if available.",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "obTime": {
+      "value": null,
+      "type": "string",
+      "format": "HH:MM",
+      "required": false,
+      "validation": "24_hour_format"
+    },
+    "elevation": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:5000"
+    },
+    "aspect": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    },
+    "incline": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:90"
+    },
+    "summary": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "footPen": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:200"
+    },
+    "airTemp": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:-50:50"
+    },
+    "exactLocations": {
+      "value": null,
+      "type": "object",
+      "required": false,
+      "format": {
+        "type": "Point",
+        "coordinates": [null, null]
+      }
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": true,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [],
+    "aurora_ideal_missing": [
+      "obTime",
+      "elevation",
+      "aspect",
+      "incline",
+      "summary",
+      "footPen",
+      "airTemp",
+      "exactLocations"
+    ],
+    "validation_errors": []
+  }
+}

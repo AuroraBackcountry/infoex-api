@@ -1,551 +1,169 @@
-# Aurora Avalanche Reporting System
+# Aurora InfoEx Reporting System
 
 ## Overview
 
-This project consists of **three integrated systems** that work together to transform conversational avalanche safety reports into structured data submitted to the InfoEx Canadian avalanche database:
+The Aurora InfoEx Reporting System transforms conversational avalanche safety reports into structured data for submission to the InfoEx Canadian avalanche database. The system uses a **capsule-based architecture** that breaks complex reports into manageable, self-contained questions.
 
-1. **Report Generation System** - Two-agent architecture for conversational data collection
-2. **InfoEx Submission System** - Direct API submission to InfoEx endpoints
-3. **Claude Agent Microservice** - Intelligent middleware for n8n integration (see [MICROSERVICE_ARCHITECTURE.md](MICROSERVICE_ARCHITECTURE.md))
-
----
-
-## System Architecture
+## Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                         SYSTEM 1: Report Generation                  │
-│                                                                      │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │ Agent 1: Conversational Data Collection (Elrich Dumont)        │ │
-│  │ - Natural 15-step conversation with guides                     │ │
-│  │ - Captures raw responses                                       │ │
-│  │ - No formatting or validation                                  │ │
-│  └────────────────────────────────────────────────────────────────┘ │
-│                              ↓                                       │
-│                    Raw Conversational Data                           │
-│                              ↓                                       │
-│  ┌────────────────────────────────────────────────────────────────┐ │
-│  │ Agent 2: Formatting & Translation                              │ │
-│  │ - Translates casual language → OGRS terminology                │ │
-│  │ - Maps to Aurora/InfoEx schema                                 │ │
-│  │ - Generates Markdown view                                      │ │
-│  │ - Validates against InfoEx constants                           │ │
-│  └────────────────────────────────────────────────────────────────┘ │
-│                              ↓                                       │
-│                  Aurora JSON (JSONB) + Metadata                      │
-│                              ↓                                       │
-│                      Supabase Storage                                │
-│                  - structured_data (JSONB)                           │
-│                  - markdown_view (TEXT, generated)                   │
-└──────────────────────────────────────────────────────────────────────┘
-                                ↓
-┌──────────────────────────────────────────────────────────────────────┐
-│                   SYSTEM 2: InfoEx API Submission                    │
-│                                                                      │
-│  Read Aurora JSON from Supabase                                     │
-│            ↓                                                         │
-│  Strip Aurora Metadata (_aurora_metadata, _aurora_extensions)       │
-│            ↓                                                         │
-│  Submit via Individual Endpoints (Proven Working)                  │
-│            ↓                                                         │
-│  Update submission status in Supabase                               │
-└──────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    User Conversation (n8n)                       │
+│     - Dialogue Agent with dynamic question capsules              │
+│     - Collects responses progressively                          │
+│     - Stores data in Postgres                                   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│               Markdown Report Generator (Tool)                   │
+│     - Triggered when all capsules complete                      │
+│     - Creates formatted human-readable report                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                    Postgres Database                             │
+│     - Stores completed capsule JSON payloads                    │
+│     - Ready for InfoEx submission                               │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓ (On manual trigger)
+┌─────────────────────────────────────────────────────────────────┐
+│              Claude Microservice (Render)                        │
+│     - Validates individual capsule payloads                     │
+│     - Converts date formats (ISO → MM/DD/YYYY)                 │
+│     - Submits to InfoEx API endpoints                          │
+│     - Handles errors and retries                               │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
----
+## Key Components
 
-## System 1: Report Generation
+### 1. Capsule System
+Self-contained question units that guide report creation:
+- `initial_data_collection` - Basic report info (date, guides, zone)
+- `field_summary` - Weather and snow observations
+- `avalanche_observation` - Individual avalanche details
+- `avalanche_summary` - Overall avalanche activity
+- `hazard_assessment` - Danger ratings and problems
+- `snowpack_summary` - Snowpack structure
+- `terrain_observation` - Terrain choices and strategy
+- `pwl_persistent_weak_layer` - Seasonal tracking
 
-### Two-Agent Architecture
+See [CAPSULE_ARCHITECTURE.md](CAPSULE_ARCHITECTURE.md) for detailed documentation.
 
-#### Agent 1: Conversational Data Collection
+### 2. Claude Microservice
+A separate FastAPI service that handles InfoEx API submission:
+- Validates payloads against InfoEx requirements
+- Manages authentication and API calls
+- Provides retry logic for failed submissions
+- Returns actionable error messages
 
-#### Agent 1: Conversational Data Collection
+See [infoex-agent-service/README.md](infoex-agent-service/README.md) for microservice documentation.
 
-**Purpose**: Natural conversation with guides to collect report information
+## Data Standards
 
-**Responsibilities**:
-- Guide users through 15-step report collection process
-- Maintain conversational, empathetic tone
-- Capture raw responses without formatting
-- Store conversational data for Agent 2
+### Date Formats
+- **Display/Storage**: ISO format `yyyy-MM-dd`
+- **InfoEx API**: `MM/DD/YYYY` (converted at submission)
 
-**Agent 1 Does NOT**:
-- Format data to schemas
-- Translate to OGRS codes
-- Validate enums
-- Generate final JSON
+### OGRS Compliance
+All weather observations follow Official Guidelines for Reporting Standards:
+- Wind: Calm/Light/Moderate/Strong/Extreme → C/L/M/S/X
+- Precipitation: Descriptive → S1-S10 intensity codes
+- Sky: Clear/Few/Scattered/Broken/Overcast → CLR/FEW/SCT/BKN/OVC
 
-**Output**: Raw conversational data (key-value pairs)
+### Submission States
+- **IN_REVIEW**: Draft mode (default) - not publicly visible
+- **SUBMITTED**: Final mode - publicly visible in InfoEx
 
-#### Agent 2: Formatting & Translation
+## InfoEx API Integration
 
-**Purpose**: Transform raw conversational data into validated Aurora/InfoEx schema
+### Endpoints Used
+Aurora submits to these InfoEx observation endpoints:
+- `/observation/fieldSummary` - Daily operational summary with weather
+- `/observation/avalancheSummary` - Avalanche activity overview
+- `/observation/avalanche` - Individual avalanche observations
+- `/observation/hazardAssessment` - Hazard ratings and problems
+- `/observation/snowpackAssessment` - Snowpack conditions
+- `/observation/terrain` - Terrain observations
 
-**Responsibilities**:
-- Translate casual language to OGRS terminology (e.g., "light winds" → "L")
-- Map responses to exact InfoEx enums (e.g., "possible" → "Possible")
-- Structure data according to Aurora/InfoEx hybrid schema
-- Generate Markdown view for human reading
-- Validate against InfoEx constants pulled from API
-- Apply CMAH (Conceptual Model of Avalanche Hazard) methodology
-- Add metadata for lineage tracking
+**Note**: Aurora does NOT use `/observation/weather` (for automated weather stations).
 
-**Agent 2 Does NOT**:
-- Interact with users
-- Conduct conversations
-- Modify Agent 1's workflow
+## Quick Start
 
-**Output**: 
-- Aurora JSON (JSONB) with InfoEx-compatible structure
-- Markdown view (generated, not stored as source)
-- Validation metadata
+### Prerequisites
+- Node.js 18+ (for n8n)
+- Python 3.11+ (for Claude microservice)
+- PostgreSQL 14+
+- Redis 7+
 
-### Agent Training & Enum Validation
+### Setup
 
-Both agents are trained with:
-- **Strict system prompts** defining exact terminology
-- **JSON Schema constraints** for structured outputs
-- **Few-shot examples** showing correct vs incorrect formats
-- **Real-time validation** against database-stored InfoEx constants
-- **Embedding-based similarity** for catching near-misses
+1. **Database Setup**
+   ```sql
+   -- Create tables for capsule storage
+   -- See CAPSULE_ARCHITECTURE.md for schema
+   ```
 
-**Critical Enum Mappings** (database-driven):
-```
-Likelihood → Sensitivity:
-  "Unlikely" → "Unreactive"
-  "Possible" → "Reactive"
-  "Likely" → "Touchy"
-  "Certain" → "Touchy"
+2. **n8n Configuration**
+   - Import workflow templates
+   - Configure environment variables
+   - Set up capsule questions
 
-Avalanche Types:
-  "Storm Slabs" → "STORM_SLAB"
-  "Wind Slabs" → "WIND_SLAB"
-  etc.
+3. **Claude Microservice**
+   ```bash
+   cd infoex-agent-service
+   cp env.example .env
+   # Edit .env with your credentials
+   docker-compose up
+   ```
 
-Size: 1 → "Size1", 1.5 → "Size15", etc.
-Wind Speed: "Light" → "L", "Moderate" → "M", etc.
-```
+## Documentation
 
-### Data Storage
+- [CAPSULE_ARCHITECTURE.md](CAPSULE_ARCHITECTURE.md) - Detailed capsule system design
+- [REDIS_SESSION_MANAGEMENT.md](REDIS_SESSION_MANAGEMENT.md) - Session handling documentation
+- [VALIDATION_RULES.md](VALIDATION_RULES.md) - Data validation standards
+- [INFOEX_API_REFERENCE.md](INFOEX_API_REFERENCE.md) - Complete InfoEx API documentation
+- [FIELD_MAPPING_TABLE.md](FIELD_MAPPING_TABLE.md) - Aurora to InfoEx field mappings
 
-**Single Source of Truth**: Aurora JSON (JSONB) in Supabase
+## Environment Variables
 
-**Storage Structure**:
-```sql
-CREATE TABLE reports (
-  id UUID PRIMARY KEY,
-  user_id UUID NOT NULL,
-  structured_data JSONB NOT NULL,  -- Aurora JSON with metadata
-  markdown_view TEXT,               -- Generated on-demand or cached
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW(),
-  submitted_at TIMESTAMP
-);
-```
-
-**Aurora JSON includes**:
-- `_aurora_metadata`: Lineage tracking (report_id, schema_version, created_by, timestamps)
-- InfoEx-compatible observation data (fieldSummary, weather, avalancheProblems, hazardAssessment)
-- `_aurora_extensions`: Submission status, InfoEx response data
-
-### System 1 Does NOT
-### System 1 Does NOT
-- Submit to InfoEx APIs
-- Handle downstream processing
-- Transform Aurora schema (already InfoEx-compatible)
-
-### Relevant Documentation
-- `agent_system_prompt_report_process.md` - Agent 1 workflow and instructions
-- `aurora-json-template.json` - Aurora/InfoEx hybrid schema specification
-- `VALIDATION_RULES.md` - Field validation rules for Aurora schema
-- `OGRS.txt` - Official Guidelines for Reporting Standards
-
----
-
-## System 2: InfoEx API Submission
-
-### Purpose
-Submit Aurora-formatted reports from Supabase to the InfoEx API system using individual endpoint submissions.
-
-### Process Flow
-1. **Retrieve**: Read Aurora JSON from Supabase `structured_data` column
-2. **Prepare**: Strip Aurora-specific metadata fields (`_aurora_metadata`, `_aurora_extensions`)
-3. **Submit**: Individual POST calls to proven working endpoints
-4. **Update**: Mark report as submitted in Supabase with InfoEx response data
-
-### Individual Endpoint Submission Strategy
-Uses separate API calls for each observation type for reliable, tested approach:
-
-```bash
-# 1. Field Summary
-POST /observation/fieldSummary
-{
-  "obDate": "10/07/2025",
-  "obStartTime": "08:30",
-  "obEndTime": "15:45",
-  "tempHigh": 0,
-  "tempLow": -2,
-  "comments": "Daily operational summary",
-  "locationUUIDs": ["zone-uuid"],
-  "operationUUID": "operation-uuid",
-  "state": "SUBMITTED"
-}
-
-# 2. Avalanche Summary
-POST /observation/avalancheSummary
-{
-  "obDate": "10/07/2025",
-  "avalanchesObserved": "New avalanches",
-  "percentAreaObserved": 75.0,
-  "comments": "Avalanche activity summary",
-  "locationUUIDs": ["zone-uuid"],
-  "operationUUID": "operation-uuid",
-  "state": "SUBMITTED"
-}
-
-# 3. Hazard Assessment
-POST /observation/hazardAssessment
-{
-  "obDate": "10/07/2025",
-  "obTime": "14:00",
-  "assessmentType": "Nowcast",
-  "usersPresent": ["user-uuid"],
-  "avalancheProblems": [{ /* problem objects */ }],
-  "hazardRatings": [{ /* rating objects */ }],
-  "locationUUIDs": ["zone-uuid"],
-  "operationUUID": "operation-uuid",
-  "state": "SUBMITTED"
-}
-
-# 4. Avalanche Observation (if applicable)
-POST /observation/avalanche
-{
-  "obDate": "10/07/2025",
-  "obTime": "14:00",
-  "character": "STORM_SLAB",
-  "trigger": "Na",
-  "sizeMin": 1.5,
-  "sizeMax": 2.0,
-  "locationUUIDs": ["zone-uuid"],
-  "operationUUID": "operation-uuid",
-  "state": "SUBMITTED"
-}
+### n8n Agent
+```env
+POSTGRES_CONNECTION=postgresql://user:pass@localhost/aurora
+REDIS_URL=redis://localhost:6379
+INFOEX_OPERATION_UUID=your-aurora-operation-uuid
 ```
 
-**Benefits**:
-- Proven working endpoints through extensive testing
-- Clear error handling per observation type
-- Flexible submission (can submit partial reports)
-- Direct submission without workflow dependencies
-
-### Dynamic Reference Data Syncing
-
-System 2 maintains up-to-date mappings via periodic sync jobs:
-
-#### Zone Mappings
-```sql
--- Daily sync from GET /location
-CREATE TABLE zone_mappings (
-  zone_name TEXT PRIMARY KEY,
-  location_uuid UUID NOT NULL,
-  operation_uuid UUID NOT NULL,
-  active BOOLEAN DEFAULT true,
-  last_synced TIMESTAMP DEFAULT NOW()
-);
+### Claude Microservice
+```env
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+ENVIRONMENT=staging
+STAGING_API_KEY=your-staging-key
+STAGING_OPERATION_UUID=your-staging-uuid
 ```
 
-#### InfoEx Constants
-```sql
--- Daily sync from GET /observation/constants/
-CREATE TABLE infoex_constants (
-  constant_type TEXT NOT NULL,
-  valid_values JSONB NOT NULL,
-  last_updated TIMESTAMP DEFAULT NOW()
-);
-```
+## Development Workflow
 
-Ensures:
-- No hardcoded UUIDs
-- Always current enum values
-- Validation against live InfoEx data
+1. **User starts report** → n8n dialogue agent presents first capsule
+2. **Progressive completion** → Each capsule stored in Postgres
+3. **Generate markdown** → Tool creates human-readable report
+4. **Review report** → User checks and approves
+5. **Trigger submission** → Claude validates and sends to InfoEx
+6. **Track results** → Store InfoEx responses
 
-### System 2 Does NOT
-- Interact with guides or users
-- Generate Aurora JSON (only reads existing)
-- Create Markdown
-- Store reports (only reads and updates status)
+## Testing
 
-### Relevant Documentation
-- `README.md` (this document) - Overall architecture
-- `FIELD_MAPPING_TABLE.md` - Individual endpoint field mapping guide
-- `INFOEX_API_REFERENCE.md` - Complete InfoEx API documentation
-- `infoex-api-docs.json` - Complete InfoEx API schema
-- `infoex-api-payloads/` - Working payload templates:
-  - `avalanche_observation.json`
-  - `avalanche_summary.json`
-  - `field_summary.json`
-  - `hazard_assessment.json`
-  - `snowProfile_observation.json` (detailed snow profiles)
-  - `snowpack_summary.json` (general snowpack assessment)
-  - `terrain_observation.json`
-  - `pwl_persistent_weak_layer.json`
+- Capsule validation tests: `capsule prompts/`
+- API payload examples: `infoex-api-payloads/`
+- Agent prompt versions: `agent prompts/`
+
+## Support
+
+For issues or questions:
+1. Check the documentation in this repository
+2. Review InfoEx API documentation
+3. Contact Aurora Backcountry development team
 
 ---
 
-## Data Formats
-
-### Aurora JSON Schema (Hybrid Approach)
-
-The Aurora schema is a **hybrid format** that bridges conversational data collection and InfoEx API submission:
-
-**Design Philosophy**:
-- InfoEx-compatible field names and structure
-- Optimized for single-document storage (all observations in one JSON)
-- Includes metadata for lineage without affecting InfoEx submission
-- Minimal transformation required for API submission
-
-**Example Structure**:
-```json
-{
-  "_aurora_metadata": {
-    "report_id": "uuid",
-    "schema_version": "2.0.0",
-    "created_at": "2025-10-05T10:30:00Z",
-    "created_by": "guide-name",
-    "agent_version": "agent-2-v1.0.0",
-    "raw_conversation_id": "uuid",
-    "processing_notes": []
-  },
-  
-  "fieldSummary": {
-    "obDate": "2025/02/21",
-    "tempHigh": 0,
-    "tempLow": -2,
-    "windSpeed": "M",
-    "windDirection": "S",
-    "hs": 200,
-    "hn24": 30,
-    "comments": "Daily operational summary",
-    "locationUUIDs": ["zone-uuid"],
-    "operationUUID": "operation-uuid",
-    "state": "SUBMITTED"
-  },
-  
-  "weather": {
-    "obDate": "2025/02/21",
-    "obTime": "08:00",
-    "tempMax": 0,
-    "tempMin": -2,
-    "windSpeed": "M",
-    "windDirection": "S",
-    "locationUUIDs": ["zone-uuid"],
-    "operationUUID": "operation-uuid",
-    "state": "SUBMITTED"
-  },
-  
-  "avalancheProblems": [
-    {
-      "obDate": "2025/02/21",
-      "character": "STORM_SLAB",
-      "location": "North aspects, treeline",
-      "distribution": "Specific",
-      "sensitivity": "Reactive",
-      "typicalSize": "Size15",
-      "state": "SUBMITTED"
-    }
-  ],
-  
-  "hazardAssessment": {
-    "obDate": "2025/02/21",
-    "hazardRatings": [
-      { "elevationBand": "ALP", "hazardRating": "3" },
-      { "elevationBand": "TL", "hazardRating": "2" },
-      { "elevationBand": "BTL", "hazardRating": "2" }
-    ],
-    "state": "SUBMITTED"
-  },
-  
-  "_aurora_extensions": {
-    "submission_status": "pending",
-    "infoex_submission": null
-  }
-}
-```
-
-### Why Hybrid Schema?
-
-**Problem**: InfoEx schema is split across multiple API endpoints (weather, field summary, avalanche problems, hazard assessment), but guides provide information as one cohesive report.
-
-**Solution**: Store everything in one Aurora document with InfoEx-compatible structure, then split for API submission.
-
-**Benefits**:
-- ✅ No transformation layer needed
-- ✅ Direct validation against InfoEx schema
-- ✅ Single document for queries and display
-- ✅ Metadata doesn't interfere with submission
-- ✅ Easy to generate Markdown from complete report
-
----
-
-## Enum Mapping & Validation
-
-### Database-Driven Mappings
-
-All enum conversions are stored in the database and validated at runtime:
-
-```sql
-CREATE TABLE enum_mappings (
-  id SERIAL PRIMARY KEY,
-  mapping_type TEXT NOT NULL,
-  source_value TEXT NOT NULL,
-  target_value TEXT NOT NULL,
-  valid_from DATE DEFAULT CURRENT_DATE,
-  valid_to DATE,
-  notes TEXT,
-  UNIQUE(mapping_type, source_value, valid_from)
-);
-```
-
-**Critical Mappings**:
-- `likelihood_to_sensitivity`: "Possible" → "Reactive"
-- `avalanche_types`: "Storm Slabs" → "STORM_SLAB"
-- `avalanche_size`: 1.5 → "Size15"
-- `wind_speed`: "Moderate" → "M"
-
-### Multi-Layer Validation
-
-1. **Agent 2 validates** during formatting (JSON Schema + few-shot learning)
-2. **Database validates** against enum_mappings table
-3. **InfoEx constants validate** against live API data
-4. **Zod schema validates** structure before storage
-5. **InfoEx API validates** on submission
-
----
-
-## File Structure
-
-### System 1 (Agent) Documentation
-- `agent_system_prompt_report_process.md` - Agent 1 & 2 behavior and workflows
-- `aurora-json-template.json` - Aurora/InfoEx hybrid schema specification
-- `VALIDATION_RULES.md` - Validation rules and enum mappings
-- `OGRS.txt` - Reporting standards reference
-
-### System 2 (Submission) Documentation
-- `README.md` - This architecture overview
-- `FIELD_MAPPING_TABLE.md` - Individual endpoint field mapping guide
-- `INFOEX_API_REFERENCE.md` - InfoEx API endpoints and usage
-- `infoex-api-docs.json` - Complete API schema
-- `infoex-api-payloads/` - Working payload templates for each observation type
-
-### Supporting Documentation
-- `AGENT_INTEGRATION_SUMMARY.md` - Two-agent workflow details
-- `IMPLEMENTATION_GUIDE.md` - Implementation instructions
-- `MICROSERVICE_ARCHITECTURE.md` - Claude agent microservice detailed architecture
-- `DOCUMENTATION_UPDATES_SUMMARY.md` - Recent documentation standardization changes
-- `markdown-examples/` - Sample reports for reference
-
----
-
-## Key Principles
-
-### Separation of Concerns
-- **Agent 1** focuses on conversational UX and data collection
-- **Agent 2** focuses on formatting, validation, and schema compliance
-- **System 2** focuses on reliable API submission
-- Each component can be developed, tested, and deployed independently
-
-### Single Source of Truth
-- Aurora JSON (JSONB) is the authoritative data format
-- Markdown is generated on-demand for human viewing
-- InfoEx submission data is ephemeral (stripped from Aurora JSON)
-
-### Schema Versioning
-All Aurora JSON includes `_aurora_metadata.schema_version` for:
-- Supporting schema evolution over time
-- Converting old reports to new formats
-- Maintaining backward compatibility
-- Clear migration paths
-
-### Data Flow
-1. Raw conversation → Agent 1
-2. Formatted data → Agent 2
-3. Aurora JSON → Supabase
-4. Stripped JSON → InfoEx API
-5. Status update → Supabase
-
-### Error Handling
-- **Agent 1 errors**: User can retry conversation
-- **Agent 2 errors**: Can reprocess raw data without user interaction
-- **System 2 errors**: Original Aurora JSON preserved for retry
-- **Atomic submission**: All-or-nothing prevents partial data in InfoEx
-
----
-
-## Standards Compliance
-
-### OGRS (Official Guidelines for Reporting Standards)
-Agent 2 translates casual observations to OGRS codes. System 2 preserves these codes in InfoEx submission.
-
-### CAA (Canadian Avalanche Association)
-Both agents and submission system follow CAA standards for avalanche observation data structure and terminology.
-
-### InfoEx API
-- Aurora schema aligns with InfoEx field names and enums
-- System 2 uses atomic batch submission (`/workflow/executionAggregate`)
-- Dynamic syncing ensures validation against current InfoEx constants
-
----
-
-## Development Guidelines
-
-### When Working on Agent 1 (Conversation)
-- Focus on natural, empathetic conversation flow
-- Capture raw responses without formatting
-- Test conversation quality and completion rate
-- Ensure all 15 steps are covered
-- **Do not** worry about schemas or validation
-
-### When Working on Agent 2 (Formatting)
-- Focus on accurate enum translation
-- Validate against InfoEx constants
-- Test edge cases and casual language variations
-- Ensure schema compliance
-- Generate accurate Markdown views
-- **Do not** modify conversation flow
-
-### When Working on System 2 (Submission)
-- Focus on reliable atomic submissions
-- Handle API errors gracefully
-- Maintain sync jobs for zones and constants
-- Track submission status accurately
-- **Do not** modify report generation or formatting
-
----
-
-## Maintenance
-
-### Schema Stability
-- Aurora schema changes are versioned (`schema_version` field)
-- Old reports can be converted to new schema versions
-- Document all breaking changes thoroughly
-
-### API Monitoring
-- Monitor InfoEx API changes via their documentation
-- Update zone and constant sync jobs as needed
-- Test against InfoEx staging environment before production
-
-### Standards Updates
-- Update OGRS code translations as standards evolve
-- Maintain enum_mappings table with valid date ranges
-- Archive example reports for regression testing
-
-### Sync Jobs
-- **Daily**: Sync InfoEx zones (`GET /location`)
-- **Daily**: Sync InfoEx constants (`GET /observation/constants/`)
-- **On failure**: Alert and retry with exponential backoff
-
----
-
-*This document serves as the authoritative reference for the overall system architecture. Refer to component-specific documentation for implementation details.*
+*This system ensures accurate, consistent avalanche reporting while maintaining a conversational user experience.*

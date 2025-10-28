@@ -34,7 +34,7 @@
   "_hs_constraint": "Optional. Number (double). Height of snow (total snow depth) in centimeters. Range: 0-1000cm. Current total snow depth measurement.",
   
   "hn24": 30,
-  "_hn24_constraint": "Optional. Number (double). Height of new snow in 24 hours in centimeters. Range: 0-200cm. Must be <= hs if both provided.",
+  "_hn24_constraint": "Optional. Number (double). Height of new snow in 24 hours in centimeters. Range: 0-200cm. Per OGRS: May exceed HS in early season when snowpack is shallow. Measured on 24-hour board.",
   
   "hst": 45,
   "_hst_constraint": "Optional. Number (double). Height of storm snow in centimeters. Range: 0-500cm. Total snow from current storm cycle.",

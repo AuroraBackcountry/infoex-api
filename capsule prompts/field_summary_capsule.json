@@ -1,0 +1,160 @@
+{
+  "capsule_type": "field_summary",
+  
+  "question": "Now I need the field weather observations for your operational day. Please provide: Temperature high and low (°C), elevation range (min/max in meters), wind conditions for AM and PM (speed: Calm/Light/Moderate/Strong/Extreme and direction: N/NE/E/SE/S/SW/W/NW), sky conditions for AM and PM (CLR/FEW/SCT/BKN/OVC/X), precipitation for AM and PM (NIL/S1-S10/R/RS), total snow depth HS (cm), new snow in 24hrs HN24 (cm), and any additional comments about field conditions.",
+  
+  "payload": {
+    "obDate": {
+      "value": "{{inherited.obDate}}",
+      "type": "string",
+      "format": "MM/DD/YYYY",
+      "required": true,
+      "inherited": true
+    },
+    "obStartTime": {
+      "value": "{{inherited.obStartTime}}",
+      "type": "string",
+      "format": "HH:MM",
+      "required": false,
+      "inherited": true
+    },
+    "obEndTime": {
+      "value": "{{inherited.obEndTime}}",
+      "type": "string",
+      "format": "HH:MM",
+      "required": false,
+      "inherited": true
+    },
+    "tempHigh": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:-50:50"
+    },
+    "tempLow": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:-50:50,lte:tempHigh"
+    },
+    "elevationMin": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:5000"
+    },
+    "elevationMax": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:5000,gte:elevationMin"
+    },
+    "amWindSpeed": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["C", "L", "M", "S", "X", "V"]
+    },
+    "pmWindSpeed": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["C", "L", "M", "S", "X", "V"]
+    },
+    "amWindDirection": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "VAR", "ALL"]
+    },
+    "pmWindDirection": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "VAR", "ALL"]
+    },
+    "hs": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:1000"
+    },
+    "hn24": {
+      "value": null,
+      "type": "number",
+      "required": false,
+      "validation": "range:0:200"
+    },
+    "amSky": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["CLR", "FEW", "SCT", "BKN", "OVC", "X"]
+    },
+    "pmSky": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "enum": ["CLR", "FEW", "SCT", "BKN", "OVC", "X"]
+    },
+    "amPrecip": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "validation": "precip_code"
+    },
+    "pmPrecip": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "validation": "precip_code"
+    },
+    "comments": {
+      "value": null,
+      "type": "string",
+      "required": false,
+      "max_length": 4096
+    },
+    "locationUUIDs": {
+      "value": "{{inherited.locationUUIDs}}",
+      "type": "array",
+      "required": true,
+      "inherited": true
+    },
+    "operationUUID": {
+      "value": "{{inherited.operationUUID}}",
+      "type": "string",
+      "required": true,
+      "inherited": true
+    },
+    "state": {
+      "value": "IN_REVIEW",
+      "type": "string",
+      "required": true,
+      "enum": ["IN_REVIEW", "SUBMITTED"]
+    }
+  },
+  
+  "completion_status": {
+    "is_complete": false,
+    "required_fields_missing": [],
+    "aurora_ideal_missing": [
+      "tempHigh",
+      "tempLow",
+      "elevationMin", 
+      "elevationMax",
+      "amWindSpeed",
+      "pmWindSpeed",
+      "amWindDirection",
+      "pmWindDirection",
+      "hs",
+      "hn24",
+      "amSky",
+      "pmSky",
+      "amPrecip",
+      "pmPrecip",
+      "comments"
+    ],
+    "validation_errors": []
+  }
+}

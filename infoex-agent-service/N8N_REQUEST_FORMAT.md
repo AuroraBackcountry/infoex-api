@@ -84,7 +84,7 @@ This is the exact format n8n should send to the Claude microservice:
   "jsonBody": {
     "session_id": "={{ $json.session_id }}",
     "message": "={{ $json.message }}",
-    "fixed_values": {
+    "inherited_values": {
       "operation_id": "={{ $env.OPERATION_UUID }}",
       "location_uuids": "={{ $json.location_uuids }}",
       "zone_name": "={{ $json.zone_name }}",

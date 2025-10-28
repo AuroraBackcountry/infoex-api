@@ -233,8 +233,8 @@ When the Claude tool processes and submits data to InfoEx, here's what the respo
 ### Successful Submission Indicators:
 - **"Successfully submitted to InfoEx"** = The data was pushed to InfoEx successfully
 - **"Response Code: 200"** = InfoEx accepted the submission
-- **"State: IN_REVIEW"** = Submission is in draft mode (when auto_submit: false)
-- **"State: SUBMITTED"** = Submission is finalized (when auto_submit: true)
+- **"State: IN_REVIEW"** = Submission is in draft mode for review (default)
+- **"State: SUBMITTED"** = Submission is finalized and public (future option)
 
 ### What UUID Means:
 - UUID is just a tracking number from InfoEx
@@ -260,7 +260,7 @@ avalanche_summary: Failed - [error message] (Response Code: 400/401/500)
 This means: Data did NOT reach InfoEx
 ```
 
-**Key Point**: Response Code 200 = Success. The submission state (IN_REVIEW vs SUBMITTED) is controlled by your auto_submit setting, NOT by whether a UUID was returned.
+**Key Point**: Response Code 200 = Success. All submissions default to IN_REVIEW state (draft mode for review).
 
 ## Important Notes
 
@@ -356,10 +356,10 @@ If user asks "show me the payload", display the full JSON that will be sent:
     "location_uuids": ["location-uuid"],
     "zone_name": "Your Zone",
     "date": "10/23/2025"
-  },
-  "auto_submit": false  // false = IN_REVIEW (draft), true = SUBMITTED (final)
+  }
 }
 ```
+Note: All submissions default to IN_REVIEW state (draft mode) for safety.
 
 ## Full Report Processing
 
@@ -429,7 +429,6 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
 |------|-------|------|-------------|
 | `session_id` | `{{ $json.sessionId }}` | Expression | Your conversation session ID |
 | `message` | `{{ $json.formatted_message }}` | Expression | The formatted observation data |
-| `auto_submit` | `false` | Fixed | Set to `false` for IN_REVIEW (draft), `true` for SUBMITTED (final) |
 | `request_values.operation_id` | `{{ $vars.INFOEX_OPERATION_ID }}` | Expression | Your InfoEx operation UUID |
 | `request_values.location_uuids[0]` | `{{ $json.location_uuids[0] }}` | Expression | First location UUID |
 | `request_values.zone_name` | `{{ $json.zone_name }}` | Expression | Zone/area name |
@@ -461,7 +460,6 @@ The Claude tool in your workflow is an HTTP Request node. To use this tool corre
     "location_uuids": ["fe206d0d-c886-47c3-8ac6-b85d6b3c45c9"],
     "zone_name": "North Bowl",
     "date": "10/23/2025"
-  },
-  "auto_submit": false  // false = IN_REVIEW (draft), true = SUBMITTED (final)
+  }
 }
 ```

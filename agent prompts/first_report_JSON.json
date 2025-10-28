@@ -1,0 +1,204 @@
+{
+    "meta": {
+      "report_id": null,
+      "date_iso": null,                        // "2025-10-24"
+      "zone_name": null,
+      "guides": [],
+      "created_by": null,
+      "start_time_hhmm": null,
+      "end_time_hhmm": null,
+      "location": {
+        "lat_dd": null,                        // decimal degrees
+        "lon_dd": null                         // decimal degrees
+      },
+      "status": "draft"                        // draft | ready | submitted | error
+    },
+  
+    "daily_summary": {
+      "text": null                             // overall narrative (can include location/elev context prose)
+    },
+  
+    "weather": {
+      "hs_cm": null,
+      "hn24_cm": null,
+      "precip_type": null,                     // None | Snowing | Rain | Mixed
+      "precip_intensity_code": null,           // S1|S2|S3|S4|S5
+      "wind": {
+        "dir_code": null,                      // N, NE, E, SE, S, SW, W, NW
+        "speed_code": null                     // C|L|M|S|X (Calm/Light/Moderate/Strong/Extreme)
+      },
+      "sky_cover_code": null,                  // e.g., CLR|BKN|OVC|OBS
+      "temps_C": { "t_min": null, "t_max": null },
+      "elev_range_m": { "min": null, "max": null }, // observation elevation band (meters)
+      "comments": null
+    },
+  
+    "snow_conditions": {
+      "quality": null,                         // powder | crust | wet | dry | mixed
+      "surface_form": null,                    // e.g., "DF 0.5"
+      "ski_pen_cm": null,
+      "comments": null
+    },
+  
+    "avalanche_observations": {
+      "evidence_of_instability": {
+        "observed": false,
+        "types": [],                           // "Avalanche" | "Cracking" | "Whumpfing" | "Active Ski Cut" | "None"
+        "comments": null                       // free-text comments about instability evidence (lives here)
+      },
+      "details": [
+        {
+          "num": null,                         // required only if an "Avalanche" was observed
+          "type": null,                        // STORM_SLAB | WIND_SLAB | LOOSE_DRY | LOOSE_WET | WET_SLAB | CORNICE
+          "trigger": null,                     // Na | Sa | Xe | Sc | ...
+          "aspect": null,                      // N|NE|E|SE|S|SW|W|NW|All
+          "elevation_band": null,              // Alpine | Treeline | Below Treeline
+          "size": null,                        // 1|1.5|2|...|5
+          "failure_plane": null                // optional (OGRS)
+        }
+      ]
+    },
+  
+    "avalanche_problems": {
+      "problems": [
+        {
+          "type": null,                        // "Storm Slabs" | "Wind Slabs" | "Loose Dry" | "Loose Wet" | "Wet Slabs" | "Cornice"
+          "aspects": [],                       // e.g., ["N","NE"] or ["All"]
+          "elevation_band": null,              // Alpine | Treeline | Below Treeline
+          "distribution": null,                // Isolated | Specific | Widespread
+          "sensitivity": null,                 // Unreactive | Stubborn | Reactive | Touchy
+          "size": null,                        // 1|1.5|2|2.5|3|3.5|4|4.5|5
+          "comments": null,                    // OPTIONAL free text
+          "computed_likelihood": null          // auto-derived from sensitivity × distribution (see mapping)
+        }
+      ],
+      "max_problems_allowed": 3
+    },
+  
+    "snowpack_description": {
+      "observed": null,                        // true/false
+      "text": null                             // technical layering/structure comments
+    },
+  
+    "hazard_assessment": {
+      "capture_mode": "propose_then_confirm",  // agent proposes three hazards, then asks guide to confirm
+      "proposed": {
+        "alpine": null,                        // 1..5
+        "treeline": null,                      // 1..5
+        "below_treeline": null,                // 1..5
+        "confidence": null                     // Low | Moderate | High
+      },
+      "confirmed": {
+        "alpine": null,
+        "treeline": null,
+        "below_treeline": null,
+        "confidence": null,
+        "is_confirmed": false                  // set true after guide approval
+      },
+      "evidence_summary": {
+        "weather": [],                         // auto-generated bullets
+        "snowpack": [],
+        "avalanche_observations": [],
+        "avalanche_problems": []
+      }
+    },
+  
+    "terrain": {
+      "type_of_terrain": null,                 // free text or small enum (e.g., "glades, alpine bowls, gullies")
+      "travel_advice": null,                   // RM guidance
+      "strategic_mindset": null                // "Conservative" | "Measured" | "Stepping Out" | etc.
+    },
+  
+    "other_hazards": {
+      "comment": null,
+      "risk_management": null
+    },
+  
+    "expectations_next_days": {
+      "summary": null,
+      "additional_comments": null
+    },
+  
+    "attachments": {
+      "photos": [],
+      "links": []
+    },
+  
+    "validation": {
+      "errors": [],
+      "warnings": [],
+      "checks": {
+        "must_have": {
+          "date": false,
+          "zone": false,
+          "guide": false
+        },
+        "logic": {
+          "temp_min_le_max": null,
+          "hn24_le_hs": null,
+          "problem_count_ok": null,
+          "obs_details_required_if_avalanche": null,   // true if types includes "Avalanche" AND details filled; otherwise true by default
+          "instability_types_without_details_ok": null  // true if cracking/whumpfing/active-ski-cut present and details omitted
+        },
+        "formats": {
+          "enums_ok": null,
+          "numeric_ranges_ok": null,
+          "date_time_ok": null,
+          "latlon_ok": null
+        }
+      }
+    },
+  
+    "provenance": {
+      "turn_hash": null,
+      "field_sources": {}
+    },
+  
+    "markdown_view": {
+      "header": {
+        "date": null,
+        "zone": null,
+        "guides": [],
+        "location_string": null                // pretty lat/lon string if present
+      },
+      "sections": {
+        "operational_summary": null,
+        "field_weather": {
+          "temps": null,
+          "wind": null,
+          "precip": null,
+          "sky": null,
+          "hs_hn24": null,
+          "elev_band": null                    // render from weather.elev_range_m
+        },
+        "snow_conditions": null,
+        "avalanche_problems": [],
+        "avalanche_observations": [],
+        "hazard": {
+          "alpine": null,
+          "treeline": null,
+          "below_treeline": null,
+          "confidence": null,
+          "evidence": []                       // mirrors evidence_summary
+        },
+        "terrain_travel": {
+          "type_of_terrain": null,
+          "travel_advice": null,
+          "strategic_mindset": null
+        },
+        "other_hazards": {
+          "comment": null,
+          "risk_management": null
+        },
+        "expectations_next_days": {
+          "summary": null,
+          "additional_comments": null
+        },
+        "additional_comments": null
+      },
+      "formatting": {
+        "bold_token": "**",
+        "heading_style": "ATX"
+      }
+    }
+  }

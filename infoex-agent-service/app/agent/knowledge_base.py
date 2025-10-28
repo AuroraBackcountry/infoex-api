@@ -133,7 +133,7 @@ class KnowledgeBase:
             },
             "location_mapping": {
                 "description": "Map location names to UUIDs",
-                "note": "UUIDs provided by n8n as fixed values"
+                "note": "UUIDs provided by n8n as inherited values"
             }
         }
     
