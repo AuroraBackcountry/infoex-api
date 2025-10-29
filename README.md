@@ -4,6 +4,22 @@
 
 The Aurora InfoEx Reporting System transforms conversational avalanche safety reports into structured data for submission to the InfoEx Canadian avalanche database. The system uses a **capsule-based architecture** that breaks complex reports into manageable, self-contained questions.
 
+### 🎯 Project Goal
+Create a conversational interface that guides avalanche professionals through daily report creation while:
+- Ensuring data quality through progressive validation
+- Reducing redundant questions via intelligent field inheritance  
+- Maintaining compliance with Canadian avalanche reporting standards (OGRS)
+- Providing a seamless path from conversation to InfoEx submission
+
+### 🚀 Current Status (October 2025)
+- ✅ **Database Schema**: Complete with geospatial, search, and vector support
+- ✅ **Capsule Templates**: All 9 report types loaded in Supabase
+- ✅ **Report Initialization**: Functions to create and set up new reports
+- ✅ **Validation System**: Comprehensive field and cross-field validation
+- 🚧 **Field Inheritance**: Coming next - auto-populate fields across capsules
+- 🚧 **Workflow Engine**: Smart capsule sequencing and conditional logic
+- 🚧 **n8n Integration**: Connect database functions to dialogue agent
+
 ## Architecture
 
 ```
@@ -101,7 +117,13 @@ Aurora submits to these InfoEx observation endpoints:
 1. **Database Setup**
    ```sql
    -- Create tables for capsule storage
-   -- See CAPSULE_ARCHITECTURE.md for schema
+   -- See postgres_schema.sql for complete schema
+   
+   -- The system includes PostgreSQL functions for:
+   -- 1. Report Initialization
+   -- 2. Data Validation
+   -- 3. Field Inheritance (coming soon)
+   -- 4. Workflow Management (coming soon)
    ```
 
 2. **n8n Configuration**
@@ -110,16 +132,56 @@ Aurora submits to these InfoEx observation endpoints:
    - Set up capsule questions
 
 3. **Claude Microservice**
-   ```bash
+```bash
    cd infoex-agent-service
    cp env.example .env
    # Edit .env with your credentials
    docker-compose up
    ```
 
+## Database Architecture
+
+### PostgreSQL Schema
+The system uses a sophisticated PostgreSQL database with:
+
+#### Core Tables
+- **`capsule_templates`** - Static definitions for each question capsule
+- **`report_capsules`** - Dynamic report data (one row per capsule per report)
+
+#### Key Functions
+
+**Report Initialization** (✅ Complete)
+- `start_new_report()` - Creates a new report with all capsules
+- `initialize_report_capsules()` - Sets up capsule rows from templates
+- `populate_initial_capsule()` - Pre-fills known data (date, user, etc.)
+
+**Data Validation** (✅ Complete)
+- `validate_capsule_payload()` - Comprehensive payload validation
+- `update_completion_status()` - Tracks capsule completion
+- `validate_field_value()` - Individual field validation
+- `update_capsule_field()` - Safe field updates with validation
+
+**Data Inheritance** (🚧 Coming Soon)
+- Will automatically populate fields from completed capsules
+- Reduces redundant questions
+- Ensures consistency across report sections
+
+**Workflow Management** (🚧 Coming Soon)
+- Smart capsule ordering
+- Conditional capsule presentation
+- Report aggregation
+
+### Database Features
+- **Geospatial Support**: PostGIS for location queries
+- **Full-text Search**: TSVECTOR for report searching
+- **Vector Embeddings**: pgvector for semantic search
+- **JSONB Storage**: Flexible capsule payloads
+- **Automatic Triggers**: Timestamps, validation, field extraction
+
 ## Documentation
 
 - [CAPSULE_ARCHITECTURE.md](CAPSULE_ARCHITECTURE.md) - Detailed capsule system design
+- [DATABASE_FUNCTIONS_GUIDE.md](DATABASE_FUNCTIONS_GUIDE.md) - PostgreSQL functions reference
 - [REDIS_SESSION_MANAGEMENT.md](REDIS_SESSION_MANAGEMENT.md) - Session handling documentation
 - [VALIDATION_RULES.md](VALIDATION_RULES.md) - Data validation standards
 - [INFOEX_API_REFERENCE.md](INFOEX_API_REFERENCE.md) - Complete InfoEx API documentation
